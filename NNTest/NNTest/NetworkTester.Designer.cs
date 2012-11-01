@@ -34,6 +34,7 @@
             this.button_testRun = new System.Windows.Forms.Button();
             this.textBox_testOutput = new System.Windows.Forms.TextBox();
             this.button_testSerialization = new System.Windows.Forms.Button();
+            this.button_runGenerations = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // richTextBox_simpleOut
@@ -90,11 +91,22 @@
             this.button_testSerialization.UseVisualStyleBackColor = true;
             this.button_testSerialization.Click += new System.EventHandler(this.button_testSerialization_Click);
             // 
+            // button_runGenerations
+            // 
+            this.button_runGenerations.Location = new System.Drawing.Point(325, 39);
+            this.button_runGenerations.Name = "button_runGenerations";
+            this.button_runGenerations.Size = new System.Drawing.Size(143, 50);
+            this.button_runGenerations.TabIndex = 7;
+            this.button_runGenerations.Text = "Run Generations";
+            this.button_runGenerations.UseVisualStyleBackColor = true;
+            this.button_runGenerations.Click += new System.EventHandler(this.button_runGenerations_Click);
+            // 
             // NetworkTester
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(291, 386);
+            this.ClientSize = new System.Drawing.Size(496, 386);
+            this.Controls.Add(this.button_runGenerations);
             this.Controls.Add(this.button_testSerialization);
             this.Controls.Add(this.textBox_testOutput);
             this.Controls.Add(this.button_testRun);
@@ -119,6 +131,7 @@
         private System.Windows.Forms.Button button_testRun;
         private System.Windows.Forms.TextBox textBox_testOutput;
         private System.Windows.Forms.Button button_testSerialization;
+        private System.Windows.Forms.Button button_runGenerations;
     }
 }
 

@@ -53,6 +53,14 @@
       <DependentUpon>NetworkTester.cs</DependentUpon>
     </Compile>
     <Compile Include="NN.cs" />
+    <Compile Include="NNAntSimulation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NNAntSimulation.Designer.cs">
+      <DependentUpon>NNAntSimulation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NNPopulation.cs" />
+    <Compile Include="NNPopulationSimulation.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="NetworkTester.resx">
