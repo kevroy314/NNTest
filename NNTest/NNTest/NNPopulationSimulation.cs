@@ -7,6 +7,6 @@ namespace NNTest
 {
     interface NNPopulationSimulation
     {
-        public double[] RunPopulationSimulation(List<NN> population, params object[] simParams);
+        double[] RunPopulationSimulation(List<NN> population, int numberOfIterations);
     }
 }

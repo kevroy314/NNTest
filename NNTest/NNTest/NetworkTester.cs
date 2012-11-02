@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace NNTest
 {
@@ -122,11 +123,22 @@ namespace NNTest
                 MessageBox.Show("Serialization Test Failed. Saved Object Is Not Identical To Original.");
         }
 
+        private NNPopulation pop = new NNPopulation(100, new int[] { 4, 6, 2 });
         private void button_runGenerations_Click(object sender, EventArgs e)
         {
-            NNPopulation pop = new NNPopulation(100, new int[] { 4, 6, 2 });
-            pop.RunGeneration();
-            pop.
+            DateTime before = DateTime.Now;
+            for (int j = 0; j < 100; j++)
+            {
+                pop.RunGeneration();
+                richTextBox_simpleOut.Clear();
+                richTextBox_simpleOut.WordWrap = true;
+                StringBuilder outputBuilder = new StringBuilder();
+                for (int i = 0; i < pop.LatestFitness.Length; i++)
+                    outputBuilder.AppendFormat("{0} ", pop.LatestFitness[i]);
+                richTextBox_simpleOut.Text = outputBuilder.ToString();
+            }
+            DateTime after = DateTime.Now;
+            MessageBox.Show("Seconds: " + after.Subtract(before).TotalSeconds);
         }
     }
 }

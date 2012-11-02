@@ -85,11 +85,5 @@ namespace NNTest
             }
             return new Tuple<int,double>(output,outputDist);
         }
-
-        public List<NN> Population
-        {
-            get { return population; }
-            set { population = value; }
-        }
     }
 }

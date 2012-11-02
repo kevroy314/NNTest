@@ -13,6 +13,7 @@ namespace NNTest
         private int[] networkStructure;
         private int[] hiddenLayerStructure;
         private int startPopulationSize;
+        private double[] latestFitness;
 
         public NNPopulation(int startingPopulationSize, int[] neuralNetworkLayerSizes)
         {
@@ -20,9 +21,11 @@ namespace NNTest
             startPopulationSize = startingPopulationSize;
 
             int[] hiddenLayers = new int[neuralNetworkLayerSizes.Length - 2];
-            for(int i = 1; i < hiddenLayers.Length;i++)
-                hiddenLayers[i-1] = neuralNetworkLayerSizes[i];
+            for(int i = 0; i < hiddenLayers.Length;i++)
+                hiddenLayers[i] = neuralNetworkLayerSizes[i+1];
             hiddenLayerStructure = hiddenLayers;
+
+            population = new List<NN>();
 
             for (int i = 0; i < startingPopulationSize; i++)
                 population.Add(new NN(neuralNetworkLayerSizes[0], neuralNetworkLayerSizes[neuralNetworkLayerSizes.Length - 1], neuralNetworkLayerSizes.Length - 2, hiddenLayers));
@@ -39,10 +42,18 @@ namespace NNTest
         //Need correct selection method
         public Tuple<int, int>[] SelectCouplesToBreed(double[] fitnesses)
         {
-            List<Tuple<int, int>> output = new List<Tuple<int, int>>();
-            for (int i = 1; i < fitnesses.Length * 0; i+=2)
-                output.Add(new Tuple<int, int>(i, i - 1));
-            return output.ToArray<Tuple<int, int>>();
+            Tuple<int,int>[] output = new Tuple<int,int>[fitnesses.Length];
+
+            List<KeyValuePair<int, double>> fitList = new List<KeyValuePair<int, double>>();
+            for (int i = 0; i < fitnesses.Length; i++)
+                fitList.Add(new KeyValuePair<int, double>(i, fitnesses[i]));
+            fitList.Sort((firstPair, nextPair) => { return firstPair.Value.CompareTo(nextPair.Value); });
+
+            output[0] = new Tuple<int,int>(fitList[fitList.Count-1].Key,0);
+            for(int i = 1; i < fitList.Count;i++)
+                output[i] = new Tuple<int,int>(fitList[i-1].Key,fitList[i].Key);
+
+            return output;
         }
 
         public List<NN> Breed(Tuple<int, int>[] couples)
@@ -63,12 +74,13 @@ namespace NNTest
             for (int i = 0; i < population.Count; i++)
                 for(int j = 0; j < numberOfMutations;j++)
                     if(randNumGen.NextDouble() <= weightMutationProbability)
-                        population[i].Weights[randNumGen.Next(0, population.Count - 1)] += (randNumGen.NextDouble() * weightMutationIntensityRange) - (randNumGen.NextDouble() * weightMutationIntensityRange);
+                        population[i].Weights[randNumGen.Next(0, population[i].Weights.Length - 1)] += (randNumGen.NextDouble() * weightMutationIntensityRange) - (randNumGen.NextDouble() * weightMutationIntensityRange);
         }
 
         public void RunGeneration()
         {
             double[] fitnesses = CalculateFitness();
+            latestFitness = fitnesses;
             Tuple<int,int>[] breedingCouples = SelectCouplesToBreed(fitnesses);
             population = Breed(breedingCouples);
             Mutate(0.05, 0, (int)((double)population.Count * 0.5), 0.5);
@@ -100,6 +112,12 @@ namespace NNTest
         {
             get { return startPopulationSize; }
             set { startPopulationSize = value; }
+        }
+
+        public double[] LatestFitness
+        {
+            get { return latestFitness; }
+            set { latestFitness = value; }
         }
 
         #endregion
