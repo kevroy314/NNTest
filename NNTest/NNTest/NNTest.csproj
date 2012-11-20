@@ -66,6 +66,9 @@
     <EmbeddedResource Include="NetworkTester.resx">
       <DependentUpon>NetworkTester.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="NNAntSimulation.resx">
+      <DependentUpon>NNAntSimulation.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

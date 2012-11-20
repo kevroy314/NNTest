@@ -36,7 +36,10 @@ namespace NNTest
         public double[] CalculateFitness()
         {
             NNPopulationSimulation sim = new NNAntSimulation(population.Count);
-            return sim.RunPopulationSimulation(population, 100);
+            ((NNAntSimulation)sim).Show();
+            double[] output = sim.RunPopulationSimulation(population, 1000);
+            ((NNAntSimulation)sim).Close();
+            return output;
         }
 
         //Need correct selection method

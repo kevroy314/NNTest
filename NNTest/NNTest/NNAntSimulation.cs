@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace NNTest
 {
@@ -13,7 +14,7 @@ namespace NNTest
     {
         private Random randNumGen = new Random();
 
-        private Tuple<double, double>[] lookAt;
+        private Tuple<double, double>[] directionVector;
         private Point[] location;
 
         private int simAreaWidth;
@@ -22,7 +23,7 @@ namespace NNTest
         private List<Point> food;
         private const int foodCount = 100;
 
-        private const double minFoodCaptureDist = 1;
+        private const double minFoodCaptureDist = 10;
 
         public NNAntSimulation(int populationSize)
         {
@@ -31,12 +32,12 @@ namespace NNTest
 
             InitializeComponent();
 
-            lookAt = new Tuple<double, double>[populationSize];
+            directionVector = new Tuple<double, double>[populationSize];
             location = new Point[populationSize];
 
             for (int i = 0; i < populationSize; i++)
             {
-                lookAt[i] = new Tuple<double, double>(randNumGen.NextDouble(), randNumGen.NextDouble());
+                directionVector[i] = new Tuple<double, double>(randNumGen.NextDouble(), randNumGen.NextDouble());
                 location[i] = new Point(randNumGen.Next(0, simAreaWidth - 1), randNumGen.Next(0, simAreaHeight - 1));
             }
 
@@ -48,25 +49,54 @@ namespace NNTest
         public double[] RunPopulationSimulation(List<NN> population, int numberOfIterations)
         {
             double[] score = new double[population.Count];
-
+            Bitmap buffer = new Bitmap(this.Width, this.Height);
+            Graphics g = Graphics.FromImage(buffer);
+            Graphics finalG = this.CreateGraphics();
             for (int i = 0; i < numberOfIterations; i++)
             {
+                label.Text = "Iteration # " + i + " in progress...";
+                g.Clear(Color.White);
+                for (int j = 0; j < food.Count; j++)
+                    g.FillRectangle(Brushes.Red, food[j].X, food[j].Y, 1, 1);
+                for (int j = 0; j < location.Length; j++)
+                    g.FillEllipse(Brushes.Blue, location[j].X, location[j].Y, 2, 2);
+                this.Update();
+                int numFoodToAdd = 0;
                 for (int j = 0; j < population.Count; j++)
                 {
                     Tuple<int,double> nearestFoodIndex = findNearestFoodIndex(location[j]);
-                    double[] NNInput = new double[] { food[nearestFoodIndex.Item1].X,food[nearestFoodIndex.Item1].Y,lookAt[j].Item1,lookAt[j].Item2};
+                    double[] NNInput = new double[] { food[nearestFoodIndex.Item1].X, food[nearestFoodIndex.Item1].Y, location[j].X, location[j].Y };
                     double[] NNOutput = population[j].ComputeNNOutputs(NNInput);
-                    location[j].X += (int)Math.Round(lookAt[j].Item1 * NNOutput[0]);
-                    location[j].Y += (int)Math.Round(lookAt[j].Item2 * NNOutput[1]);
+                    
+                    location[j].X += (int)Math.Round(NNOutput[0]);
+                    location[j].Y += (int)Math.Round(NNOutput[1]);
+                    if (location[j].X < 0) location[j].X = 0;
+                    else if (location[j].X > this.Width) location[j].X = this.Width;
+                    if (location[j].Y < 0) location[j].Y = 0;
+                    else if (location[j].Y > this.Height) location[j].Y = this.Height;
+                    
                     if (nearestFoodIndex.Item2 <= minFoodCaptureDist)
                     {
                         food.RemoveAt(nearestFoodIndex.Item1);
-                        food.Add(new Point(randNumGen.Next(0, simAreaWidth - 1), randNumGen.Next(0, simAreaHeight - 1)));
+                        numFoodToAdd++;
                         score[j]++;
                     }
                 }
+                for(int j = 0; j < numFoodToAdd;j++)
+                    food.Add(new Point(randNumGen.Next(0, simAreaWidth - 1), randNumGen.Next(0, simAreaHeight - 1)));
+                finalG.DrawImage(buffer, 0, 0);
             }
-
+            int maxIndex = -1;
+            double maxScore = -1;
+            for(int i = 0; i < score.Length;i++)
+                if (score[i] > maxScore)
+                {
+                    maxIndex = i;
+                    maxScore = score[i];
+                }
+            label.Text = "Done! Max Score: "+maxScore;
+            this.Update();
+            Thread.Sleep(1000);
             return score;
         }
 
