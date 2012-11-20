@@ -37,7 +37,7 @@ namespace NNTest
         {
             NNPopulationSimulation sim = new NNAntSimulation(population.Count);
             ((NNAntSimulation)sim).Show();
-            double[] output = sim.RunPopulationSimulation(population, 1000);
+            double[] output = sim.RunPopulationSimulation(population, 500);
             ((NNAntSimulation)sim).Close();
             return output;
         }

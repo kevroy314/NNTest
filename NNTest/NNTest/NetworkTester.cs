@@ -123,7 +123,7 @@ namespace NNTest
                 MessageBox.Show("Serialization Test Failed. Saved Object Is Not Identical To Original.");
         }
 
-        private NNPopulation pop = new NNPopulation(100, new int[] { 4, 6, 2 });
+        private NNPopulation pop = new NNPopulation(100, new int[] { 4, 6, 6, 2 });
         private void button_runGenerations_Click(object sender, EventArgs e)
         {
             DateTime before = DateTime.Now;

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading;
+using Microsoft.Xna.Framework;
 
 namespace NNTest
 {
@@ -15,12 +16,12 @@ namespace NNTest
         private Random randNumGen = new Random();
 
         private Tuple<double, double>[] directionVector;
-        private Point[] location;
+        private Vector2[] location;
 
         private int simAreaWidth;
         private int simAreaHeight;
 
-        private List<Point> food;
+        private List<Vector2> food;
         private const int foodCount = 100;
 
         private const double minFoodCaptureDist = 10;
@@ -33,17 +34,17 @@ namespace NNTest
             InitializeComponent();
 
             directionVector = new Tuple<double, double>[populationSize];
-            location = new Point[populationSize];
+            location = new Vector2[populationSize];
 
             for (int i = 0; i < populationSize; i++)
             {
                 directionVector[i] = new Tuple<double, double>(randNumGen.NextDouble(), randNumGen.NextDouble());
-                location[i] = new Point(randNumGen.Next(0, simAreaWidth - 1), randNumGen.Next(0, simAreaHeight - 1));
+                location[i] = new Vector2(randNumGen.Next(0, simAreaWidth - 1), randNumGen.Next(0, simAreaHeight - 1));
             }
 
-            food = new List<Point>();
+            food = new List<Vector2>();
             for (int i = 0; i < foodCount; i++)
-                food.Add(new Point(randNumGen.Next(0, simAreaWidth - 1), randNumGen.Next(0, simAreaHeight - 1)));
+                food.Add(new Vector2(randNumGen.Next(0, simAreaWidth - 1), randNumGen.Next(0, simAreaHeight - 1)));
         }
 
         public double[] RunPopulationSimulation(List<NN> population, int numberOfIterations)
@@ -55,7 +56,7 @@ namespace NNTest
             for (int i = 0; i < numberOfIterations; i++)
             {
                 label.Text = "Iteration # " + i + " in progress...";
-                g.Clear(Color.White);
+                g.Clear(System.Drawing.Color.White);
                 for (int j = 0; j < food.Count; j++)
                     g.FillRectangle(Brushes.Red, food[j].X, food[j].Y, 1, 1);
                 for (int j = 0; j < location.Length; j++)
@@ -65,7 +66,11 @@ namespace NNTest
                 for (int j = 0; j < population.Count; j++)
                 {
                     Tuple<int,double> nearestFoodIndex = findNearestFoodIndex(location[j]);
-                    double[] NNInput = new double[] { food[nearestFoodIndex.Item1].X, food[nearestFoodIndex.Item1].Y, location[j].X, location[j].Y };
+                    Vector2 nearestFood = food[nearestFoodIndex.Item1];
+                    nearestFood.Normalize();
+                    Vector2 loc = location[j];
+                    //loc.Normalize();
+                    double[] NNInput = new double[] { nearestFood.X, nearestFood.Y, loc.X, loc.Y };
                     double[] NNOutput = population[j].ComputeNNOutputs(NNInput);
                     
                     location[j].X += (int)Math.Round(NNOutput[0]);
@@ -83,7 +88,7 @@ namespace NNTest
                     }
                 }
                 for(int j = 0; j < numFoodToAdd;j++)
-                    food.Add(new Point(randNumGen.Next(0, simAreaWidth - 1), randNumGen.Next(0, simAreaHeight - 1)));
+                    food.Add(new Vector2(randNumGen.Next(0, simAreaWidth - 1), randNumGen.Next(0, simAreaHeight - 1)));
                 finalG.DrawImage(buffer, 0, 0);
             }
             int maxIndex = -1;
@@ -100,7 +105,7 @@ namespace NNTest
             return score;
         }
 
-        private Tuple<int,double> findNearestFoodIndex(Point input)
+        private Tuple<int,double> findNearestFoodIndex(Vector2 input)
         {
             int output = -1;
             double outputDist = int.MaxValue;
