@@ -21,7 +21,7 @@ namespace NNTest
         private const int foodCount = 100;
 
         //The distance at which food may be captured (in pixels) by an ant
-        private const double minFoodCaptureDist = 10;
+        private const double minFoodCaptureDist = 2;
 
         #endregion
 
@@ -103,7 +103,8 @@ namespace NNTest
             //Initialize the variables for drawing (may not be used if isShowing stays false)
             Bitmap buffer = new Bitmap(this.Width, this.Height);
             Graphics g = Graphics.FromImage(buffer);
-            Graphics finalG = this.CreateGraphics();
+            Graphics finalG = g;
+            if(isShowing) finalG = this.CreateGraphics();
 
             //Iterate through the number of request iterations
             for (int i = 0; i < numberOfIterations; i++)
@@ -163,7 +164,7 @@ namespace NNTest
 
                     //NOTE: THIS SECTION SHOULD BE CHANGED TO REFLECT MORE INPUTS WHICH COULD PRODUCE A MORE ROBUST NETWORK
                     //Generate the inputs for this iteration of the neural network
-                    double[] NNInput = new double[] { nearestFoodResult.Item1.X, nearestFoodResult.Item1.Y, loc.X,loc.Y};//,directionVector[j].X, directionVector[j].Y };
+                    double[] NNInput = new double[] { nearestFoodResult.Item1.X, nearestFoodResult.Item1.Y, directionVector[j].X,directionVector[j].Y};//,directionVector[j].X, directionVector[j].Y };
 
                     //Compute the outputs from the neural network
                     double[] NNOutput = population[j].ComputeNNOutputs(NNInput);
@@ -177,14 +178,16 @@ namespace NNTest
                     moveVector.Normalize();
 
                     //Adjust the position of the ant relative to the neural network outputs
-                    location[j].X += (int)Math.Round(moveVector.X);
-                    location[j].Y += (int)Math.Round(moveVector.Y);
+                    location[j].X += moveVector.X;
+                    location[j].Y += moveVector.Y;
 
                     //Wrap the ant location around the map so it represents a torus
-                    if (location[j].X < 0) location[j].X = this.Width - 1;
-                    else if (location[j].X > this.Width) location[j].X = 1;
-                    if (location[j].Y < 0) location[j].Y = this.Height - 1;
-                    else if (location[j].Y > this.Height) location[j].Y = 1;
+                    location[j].X = (location[j].X + this.Width) % this.Width;
+                    location[j].Y = (location[j].Y + this.Height) % this.Height;
+                    //if (location[j].X < 0) location[j].X = this.Width - 2;
+                    //else if (location[j].X > this.Width - 2) location[j].X = 0;
+                    //if (location[j].Y < 0) location[j].Y = this.Height - 2;
+                    //else if (location[j].Y > this.Height - 2) location[j].Y = 0;
                 }
 
                 //For each food vector which we need to remove because it was eaten

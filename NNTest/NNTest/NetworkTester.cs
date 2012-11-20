@@ -126,11 +126,25 @@ namespace NNTest
             //Create a string builder for output
             StringBuilder outputBuilder = new StringBuilder();
 
-            //Iterate the simulation 100 times
-            for (int j = 0; j < 100; j++)
+            //Iterate the simulation
+            for (int j = 0; j < numericUpDown_numGenerations.Value; j++)
             {
                 //Run a single generation in the neural network ant simulation
-                pop.RunGeneration(typeof(NNAntSimulation));
+                pop.RunGeneration(typeof(NNAntSimulation), checkBox_showSimulation.Checked);
+
+                double[] latestFitness = pop.LatestFitness;
+
+                double maxFitness = -1;
+                double sum = 0;
+                for (int i = 0; i < latestFitness.Length; i++)
+                {
+                    if (latestFitness[i] > maxFitness) maxFitness = latestFitness[i];
+                    sum += latestFitness[i];
+                }
+
+                chart.Series["Average"].Points.AddY(sum / latestFitness.Length);
+                chart.Series["Max"].Points.AddY(maxFitness);
+                chart.Update();
 
                 //Clear the output field
                 richTextBox_simpleOut.Clear();

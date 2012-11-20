@@ -11,7 +11,7 @@ namespace NNTest
         #region Constant Values
 
         //The number of iterations the NNPopulationSimulation which calculates the fitness should run
-        private const int numFitnessSimulationIterations = 500;
+        private const int numFitnessSimulationIterations = 1000;
 
         #endregion
 
@@ -54,17 +54,19 @@ namespace NNTest
 
         //The fitness function requires the user to select a type which they can use to create a simulation.
         //This type must implement NNPopulationSimulation.
-        public double[] CalculateFitness(Type simulationType)
+        public double[] CalculateFitness(Type simulationType, bool showSimulation)
         {
             //Create an instance of a NNPopulationSimulation of the specified type
             NNPopulationSimulation sim = (NNPopulationSimulation)Activator.CreateInstance(simulationType, new object[] { population.Count });
-
+            
+            if(showSimulation)
             //Show the simulation (the simulation may choose to not perform any operations on this call
             sim.ShowSimulation();
 
             //Run the simulation on the current population for a set number of iterations
             double[] output = sim.RunPopulationSimulation(population, numFitnessSimulationIterations);
 
+            if(showSimulation)
             //Close the simulation if it requires that
             sim.CloseSimulation();
 
@@ -81,6 +83,7 @@ namespace NNTest
             for (int i = 0; i < fitnesses.Length; i++)
                 fitList.Add(new KeyValuePair<int, double>(i, fitnesses[i]));
             fitList.Sort((firstPair, nextPair) => { return firstPair.Value.CompareTo(nextPair.Value); });
+            fitList.Reverse();
 
             //Get the number of top networks to breed
             int numToBreed = (int)Math.Floor(Math.Sqrt((double)fitnesses.Length * 1.7));
@@ -145,10 +148,10 @@ namespace NNTest
         }
 
         //Run a generation given a particular fitness simulation, this simulation must implement NNPopulationSimulation
-        public void RunGeneration(Type simulationType)
+        public void RunGeneration(Type simulationType, bool showSimulation)
         {
             //Calculate the fitnesses of a given simiulation, this simulation must implement NNPopulationSimulation
-            double[] fitnesses = CalculateFitness(simulationType);
+            double[] fitnesses = CalculateFitness(simulationType, showSimulation);
             //Set the latest fitness
             latestFitness = fitnesses;
 
