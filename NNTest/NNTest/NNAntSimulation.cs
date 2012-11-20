@@ -163,22 +163,28 @@ namespace NNTest
 
                     //NOTE: THIS SECTION SHOULD BE CHANGED TO REFLECT MORE INPUTS WHICH COULD PRODUCE A MORE ROBUST NETWORK
                     //Generate the inputs for this iteration of the neural network
-                    double[] NNInput = new double[] { nearestFoodResult.Item1.X, nearestFoodResult.Item1.Y, 1, 1 };
+                    double[] NNInput = new double[] { nearestFoodResult.Item1.X, nearestFoodResult.Item1.Y, loc.X,loc.Y};//,directionVector[j].X, directionVector[j].Y };
 
                     //Compute the outputs from the neural network
                     double[] NNOutput = population[j].ComputeNNOutputs(NNInput);
-                    
-                    //Adjust the position of the ant relative to the neural network outputs
-                    location[j].X += (int)Math.Round(NNOutput[0]);
-                    location[j].Y += (int)Math.Round(NNOutput[1]);
 
-                    //Confine the ant to the boundries of the area
-                    //An ant can attempt to leave the boundries, but will simply walk against the wall
-                    //This could, in principle, create a situation where an ant is stuck because it's inputs aren't changing
-                    if (location[j].X < 0) location[j].X = 0;
-                    else if (location[j].X > this.Width) location[j].X = this.Width;
-                    if (location[j].Y < 0) location[j].Y = 0;
-                    else if (location[j].Y > this.Height) location[j].Y = this.Height;
+                    Vector2 travelVector = new Vector2((float)NNOutput[0] - location[j].X, (float)NNOutput[1] - location[j].Y);
+                    travelVector.Normalize();
+
+                    directionVector[j] = travelVector;
+
+                    Vector2 moveVector = new Vector2((float)NNOutput[0], (float)NNOutput[1]);
+                    moveVector.Normalize();
+
+                    //Adjust the position of the ant relative to the neural network outputs
+                    location[j].X += (int)Math.Round(moveVector.X);
+                    location[j].Y += (int)Math.Round(moveVector.Y);
+
+                    //Wrap the ant location around the map so it represents a torus
+                    if (location[j].X < 0) location[j].X = this.Width - 1;
+                    else if (location[j].X > this.Width) location[j].X = 1;
+                    if (location[j].Y < 0) location[j].Y = this.Height - 1;
+                    else if (location[j].Y > this.Height) location[j].Y = 1;
                 }
 
                 //For each food vector which we need to remove because it was eaten

@@ -20,6 +20,11 @@ namespace NNTest
         //The neural network population for test
         private NNPopulation pop;
 
+        //This thread will parallel code which shouldn't run in the GUI thread
+        private Thread simThread;
+        //This bool will be used to request the simThread be stopped
+        private bool requestStop;
+
         #endregion
 
         #region Constructors
@@ -36,6 +41,11 @@ namespace NNTest
 
             //Output the default object test results
             richTextBox_simpleOut.Text = getTestDataString();
+
+            //Fill the simThread with a default value (not running)
+            simThread = new Thread(new ThreadStart(runGeneticSimulation));
+            //No stop is request at the beginning of execution
+            requestStop = false;
         }
 
         #endregion
@@ -100,6 +110,61 @@ namespace NNTest
 
             //Return the results string
             return outStringBuilder.ToString();
+        }
+
+        private void runGeneticSimulation()
+        {
+            //The simulation is not aborted by default
+            bool aborted = false;
+
+            //Store the start time for benchmarking purposes
+            DateTime before = DateTime.Now;
+
+            //Set the word wrap state to true
+            richTextBox_simpleOut.WordWrap = true;
+
+            //Create a string builder for output
+            StringBuilder outputBuilder = new StringBuilder();
+
+            //Iterate the simulation 100 times
+            for (int j = 0; j < 100; j++)
+            {
+                //Run a single generation in the neural network ant simulation
+                pop.RunGeneration(typeof(NNAntSimulation));
+
+                //Clear the output field
+                richTextBox_simpleOut.Clear();
+
+                //Fill the output string builder with the fitness data from this generation
+                for (int i = 0; i < pop.LatestFitness.Length; i++)
+                    outputBuilder.AppendFormat("{0} ", pop.LatestFitness[i]);
+
+                //Output the fitness data
+                richTextBox_simpleOut.Text = outputBuilder.ToString();
+
+                //Reset the output builder
+                outputBuilder.Clear();
+
+                //If this function is running in the simulation thread and it was aborted
+                if (requestStop)
+                {
+                    //Flag the exit as an abort
+                    aborted = true;
+                    
+                    //Break out of the loop
+                    break;
+                }
+            }
+
+            //Store the end time of the simulation
+            DateTime after = DateTime.Now;
+
+            //If the function completes in an non-aborted state, show the benchmark time
+            if (!aborted)
+                //Show a message box with the total seconds it took to run the complete program
+                MessageBox.Show("Seconds: " + after.Subtract(before).TotalSeconds);
+            else
+                MessageBox.Show("Aborted Successfully!");
         }
 
         #endregion
@@ -170,40 +235,31 @@ namespace NNTest
         //runs as expected.
         private void button_runGenerations_Click(object sender, EventArgs e)
         {
-            //Store the start time for benchmarking purposes
-            DateTime before = DateTime.Now;
-
-            //Set the word wrap state to true
-            richTextBox_simpleOut.WordWrap = true;
-
-            //Create a string builder for output
-            StringBuilder outputBuilder = new StringBuilder();
-
-            //Iterate the simulation 100 times
-            for (int j = 0; j < 100; j++)
+            /*
+            //If the thread is alive
+            if (simThread.IsAlive)
             {
-                //Run a single generation in the simulation
-                pop.RunGeneration();
-
-                //Clear the output field
-                richTextBox_simpleOut.Clear();
-                
-                //Fill the output string builder with the fitness data from this generation
-                for (int i = 0; i < pop.LatestFitness.Length; i++)
-                    outputBuilder.AppendFormat("{0} ", pop.LatestFitness[i]);
-
-                //Output the fitness data
-                richTextBox_simpleOut.Text = outputBuilder.ToString();
-
-                //Reset the output builder
-                outputBuilder.Clear();
+                //Request an abort and change the text
+                requestStop = true;
+                //Wait until it is complete
+                //while (simThread.IsAlive) ;
+                //Change the button text back to the start text
+                ((Button)sender).Text = "Run Generations";
             }
-
-            //Store the end time of the simulation
-            DateTime after = DateTime.Now;
-
-            //Show a message box with the total seconds it took to run the complete program
-            MessageBox.Show("Seconds: " + after.Subtract(before).TotalSeconds);
+            //If the thread is dead
+            else
+            {
+                //Reset the stop request
+                requestStop = false;
+                //Make a new thread object instance for the runGeneticSimulation
+                simThread = new Thread(new ThreadStart(runGeneticSimulation));
+                //Start the simulation
+                simThread.Start();
+                //Change the button text to the stop text
+                ((Button)sender).Text = "Stop Generations";
+            }
+             * */
+            runGeneticSimulation();
         }
 
         #endregion

@@ -72,8 +72,7 @@ namespace NNTest
             return output;
         }
 
-        //CONTINUE DOCUMENTING HERE!
-        //Need correct selection method
+        //NOTE: BROKEN!
         public Tuple<int, int>[] SelectCouplesToBreed(double[] fitnesses)
         {
             Tuple<int,int>[] output = new Tuple<int,int>[fitnesses.Length];
@@ -83,40 +82,83 @@ namespace NNTest
                 fitList.Add(new KeyValuePair<int, double>(i, fitnesses[i]));
             fitList.Sort((firstPair, nextPair) => { return firstPair.Value.CompareTo(nextPair.Value); });
 
-            output[0] = new Tuple<int,int>(fitList[fitList.Count-1].Key,0);
-            for(int i = 1; i < fitList.Count;i++)
-                output[i] = new Tuple<int,int>(fitList[i-1].Key,fitList[i].Key);
+            //Get the number of top networks to breed
+            int numToBreed = (int)Math.Floor(Math.Sqrt((double)fitnesses.Length * 1.7));
+
+            //Create a counter for the breeding index
+            int breedVal = 0;
+
+            //Loop through the triangular combination of the top numToBreed candidates
+            for (int i = 0; i < numToBreed; i++)
+                for (int j = i; j < numToBreed; j++)
+                {
+                    //Select their indicies
+                    output[breedVal] = new Tuple<int, int>(fitList[i].Key, fitList[j].Key);
+                    //Iterate the breed counter
+                    breedVal++;
+                }
+
+            //Fill the remaining values with random breeding with the top candidate
+            while (breedVal < fitnesses.Length)
+            {
+                output[breedVal] = new Tuple<int, int>(fitList[0].Key, fitList[Util.randNumGen.Next(0, fitList.Count - 1)].Key);
+                breedVal++;
+            }
 
             return output;
         }
 
+        //This function will breed a set of couples defined by index tuples in the population
         public List<NN> Breed(Tuple<int, int>[] couples)
         {
+            //Create a list of new neural networks for the next generation
             List<NN> newPopulation = new List<NN>();
+
+            //For each couple in the breeding set
             for (int i = 0; i < couples.Length; i++)
             {
+                //Add a new neural network to the population with the same structure as the rest of the population
                 newPopulation.Add(new NN(networkStructure[0], networkStructure[networkStructure.Length - 1], hiddenLayerStructure.Length, hiddenLayerStructure));
+
+                //For each weight in the breeding couple, average the weights of the parents to create the child weights
                 for (int j = 0; j < newPopulation[i].Weights.Length; j++)
                     newPopulation[i].Weights[j] = (population[couples[i].Item1].Weights[j] + population[couples[i].Item2].Weights[j]) / 2;
             }
+            
+            //Return the new population
             return newPopulation;
         }
 
+        //This function will mutate the population given some probability, a min and max number of mutations, and a range for the mutation (the weight, if mutated, will mutate within that range either positive or negative)
         public void Mutate(double weightMutationProbability, int minNumberOfMutations, int maxNumberOfMutations, double weightMutationIntensityRange)
         {
+            //Decide how many mutations will happen, at most
             int numberOfMutations = Util.randNumGen.Next(minNumberOfMutations,maxNumberOfMutations);
+
+            //For each member of the population, provide the appropriate number of opportunities for mutation
             for (int i = 0; i < population.Count; i++)
                 for(int j = 0; j < numberOfMutations;j++)
+                    //Decide if a given mutation chance will result in an actual mutation
                     if (Util.randNumGen.NextDouble() <= weightMutationProbability)
+                        //Mutate a random weight within the mutation range (this weight could be the same weight every mutation, resulting in compounded mutations on a given weight)
                         population[i].Weights[Util.randNumGen.Next(0, population[i].Weights.Length - 1)] += (Util.randNumGen.NextDouble() * weightMutationIntensityRange) - (Util.randNumGen.NextDouble() * weightMutationIntensityRange);
         }
 
-        public void RunGeneration()
+        //Run a generation given a particular fitness simulation, this simulation must implement NNPopulationSimulation
+        public void RunGeneration(Type simulationType)
         {
-            double[] fitnesses = CalculateFitness();
+            //Calculate the fitnesses of a given simiulation, this simulation must implement NNPopulationSimulation
+            double[] fitnesses = CalculateFitness(simulationType);
+            //Set the latest fitness
             latestFitness = fitnesses;
+
+            //Select the breeding couples given their fitness
             Tuple<int,int>[] breedingCouples = SelectCouplesToBreed(fitnesses);
+
+            //Breed the selected couples
             population = Breed(breedingCouples);
+
+            //Mutate the new population
             Mutate(0.05, 0, (int)((double)population.Count * 0.5), 0.5);
         }
 
