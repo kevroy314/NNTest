@@ -13,13 +13,11 @@ namespace NNTest
     {
         #region Member Variables
 
-        private static Random randNumGen = new Random(); //Random Number Generator for Initialization
-
         //Constructor Parameters
-        private int numberOfInputs;
-        private int numberOfOutputs;
-        private int numberOfHiddenLayers;
-        private int[] numberOfNodesPerHiddenLayer;
+        private int numberOfInputs; //The number of inputs to the neural network
+        private int numberOfOutputs; //The number of outputs from the neural network
+        private int numberOfHiddenLayers; //The number of hidden layers in the network
+        private int[] numberOfNodesPerHiddenLayer; //The number of nodes in each hidden layer in the network
 
         private int numberOfLayers; //The number of layers in the neural network (including input and output)
         private int numberOfNodes; //The total number of nodes in the network
@@ -68,6 +66,7 @@ namespace NNTest
 
         public void initializeRandomNewNN(int numInputs, int numOutputs, int numHiddenLayers, int[] nodesPerHiddenLayer)
         {
+            //Set input values first
             numberOfInputs = numInputs;
             numberOfOutputs = numOutputs;
             numberOfHiddenLayers = numHiddenLayers;
@@ -75,23 +74,29 @@ namespace NNTest
 
             numberOfLayers = 2 + numHiddenLayers; //The input layer, output layer and hidden layers
             nodesPerLayer = new int[numberOfLayers];
-            nodesPerLayer[0] = numInputs; //Input layer nodes
-            numberOfHiddenNodes = 0;
-            numberOfNodes = nodesPerLayer[0];
+            nodesPerLayer[0] = numInputs; //Set the first layer to the input layer size
+            numberOfHiddenNodes = 0; //Counter that will hold the number of hidden nodes by the end of the constructor
+            numberOfNodes = nodesPerLayer[0]; //Counter that will hold the number of nodes by the end of the constructor
             for (int i = 1; i < numHiddenLayers + 1; i++)
             {
-                nodesPerLayer[i] = nodesPerHiddenLayer[i - 1]; //Hidden layer nodes
+                //Starting with the first hidden layer, iterate through all hidden layers
+                //Set the nodes per layer to the hidden layer size
+                nodesPerLayer[i] = nodesPerHiddenLayer[i - 1];
+                //Increment the two node counters
                 numberOfHiddenNodes += nodesPerLayer[i];
                 numberOfNodes += nodesPerLayer[i];
             }
-            nodesPerLayer[nodesPerLayer.Length - 1] = numOutputs; //Output layer nodes
+            //Set the output layer as the last layer length
+            nodesPerLayer[nodesPerLayer.Length - 1] = numOutputs;
+            //Increment the counter
             numberOfNodes += nodesPerLayer[nodesPerLayer.Length - 1];
 
-            inputsPerLayer = new int[numberOfLayers];
-            weightsPerLayer = new int[numberOfLayers];
-            weightStartIndexPerLayer = new int[numberOfLayers];
+            //Simple helper variables to make the code more readable
+            inputsPerLayer = new int[numberOfLayers]; //The number of inputs each node should have per layer (input layer has 1 input each, every other layer has the number of nodes in the previous layer)
+            weightsPerLayer = new int[numberOfLayers]; //The number of weights each node should have per layer (this should be one more than the number of inputs as there is a threshold bias for each node)
+            weightStartIndexPerLayer = new int[numberOfLayers]; //Start index in the network where each layer nodes live in the weight array
 
-            int numWeights = nodesPerLayer[0] * 2; //Add two weights (normal weight and bias for each input) for each input node
+            int numWeights = nodesPerLayer[0] * 2; //Set the number of weights equal to the input layer inputs * 2 (each node has an input and a bias)
             inputsPerLayer[0] = 1; //Input layer
             weightsPerLayer[0] = 2; //Input layer, each node has inputs and bias
             weightStartIndexPerLayer[0] = 0; //Input layer weights start at index 0
@@ -123,7 +128,7 @@ namespace NNTest
 
             //Populate the weights with random values between -1 and 1
             for (int i = 0; i < weights.Length; i++)
-                weights[i] = randNumGen.NextDouble() - randNumGen.NextDouble();
+                weights[i] = Util.randNumGen.NextDouble() - Util.randNumGen.NextDouble();
         }
 
         #endregion

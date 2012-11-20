@@ -12,23 +12,44 @@ namespace NNTest
 {
     public partial class NetworkTester : Form
     {
+        #region Member Variables
+
+        //An internal neural network which is created purely for testing without an application
         private NN testNN;
+
+        //The neural network population for test
+        private NNPopulation pop;
+
+        #endregion
+
+        #region Constructors
 
         public NetworkTester()
         {
             InitializeComponent();
 
-            testNN = new NN(4, 2, 1, new int[] { 6 });
+            //Initial the network to have 4 inputs, 2 outputs and 1 hidden layer with 6 nodes
+            testNN = new NN(2, 1, 1, new int[] { 1 });
 
+            //Build a test population with 100 members and a 4 layer network with 4 inputs, 2 outputs, and 2 hidden layers with 6 nodes each
+            pop = new NNPopulation(100, new int[] { 4, 6, 6, 2 });
+
+            //Output the default object test results
             richTextBox_simpleOut.Text = getTestDataString();
         }
 
+        #endregion
+
+        #region Internal Test Functions
+
+        //This is the default test for the neural network to confirm it is performing as expected
         public string getTestDataString()
         {
             StringBuilder outStringBuilder = new StringBuilder();
             outStringBuilder.AppendLine("Test Neural Network");
             outStringBuilder.AppendLine("-------------------");
 
+            //Print the input data
             outStringBuilder.AppendLine("Input Data");
             outStringBuilder.AppendFormat("Number of Inputs: {0}\n", testNN.NumberOfInputs);
             outStringBuilder.AppendFormat("Number of Outputs: {0}\n", testNN.NumberOfOutputs);
@@ -37,6 +58,7 @@ namespace NNTest
             Array.ForEach(testNN.NumberOfNodesPerHiddenLayer, x => outStringBuilder.AppendFormat("{0} ", x));
             outStringBuilder.AppendLine();
 
+            //Print the calculated data
             outStringBuilder.AppendLine("-------------------");
             outStringBuilder.AppendLine("General Calculated Metadata");
             outStringBuilder.AppendFormat("Total Number of Layers: {0}\n", testNN.NumberOfLayers);
@@ -44,6 +66,7 @@ namespace NNTest
             outStringBuilder.AppendFormat("Total Number of Hidden Nodes: {0}\n", testNN.NumberOfHiddenNodes);
             outStringBuilder.AppendLine();
 
+            //Print the layer data
             outStringBuilder.AppendLine("-------------------");
             outStringBuilder.AppendLine("Specific Calculated Metadata Per Layer");
             outStringBuilder.AppendLine("Number of Weights Per Layer: ");
@@ -67,6 +90,7 @@ namespace NNTest
             outStringBuilder.AppendLine();
             outStringBuilder.AppendLine();
 
+            //Print the detailed data
             outStringBuilder.AppendLine("-------------------");
             outStringBuilder.AppendLine("Detailed Data");
             outStringBuilder.AppendFormat("Number of Weights: {0}\n", testNN.Weights.Length);
@@ -74,71 +98,114 @@ namespace NNTest
             Array.ForEach(testNN.Weights, x => outStringBuilder.AppendFormat("{0}\n", x));
             outStringBuilder.AppendLine();
 
+            //Return the results string
             return outStringBuilder.ToString();
         }
 
+        #endregion
+
+        #region Button Click Event Callbacks
+
+        //This function executes a basic input/output tests on the neural network
         private void button_testRun_Click(object sender, EventArgs e)
         {
+            //Get the input tokens from the user
             string[] tokens = textBox_testInput.Text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-
+            //If the user hasn't put in the correct number of inputs, show an error and exit the function
             if(tokens.Length!=testNN.NumberOfInputs)
             {
                 MessageBox.Show("Error: Incorrect Number of Inputs. Found "+tokens.Length+", expected "+testNN.NumberOfInputs+". Are you separating inputs with spaces?");
                 return;
             }
 
+            //Build an input array
             double[] input = new double[tokens.Length];
 
             for (int i = 0; i < tokens.Length; i++)
             {
                 try
                 {
+                    //Parse the token to a double
                     input[i] = double.Parse(tokens[i]);
                 }
                 catch (FormatException)
                 {
+                    //If the parse fails, show an error and exit the function
                     MessageBox.Show("Incorrect token found at item " + i + " (0 is the first item). Confirm that the number is a properly formatted double precision floating point value.");
                     return;
                 }
             }
 
+            //Compute an output based on the inputs
             double[] output = testNN.ComputeNNOutputs(input);
 
+            //Create a string builder for quick output
             StringBuilder outputStringBuilder = new StringBuilder();
 
+            //Fill it with the output data
             for (int i = 0; i < output.Length; i++)
                 outputStringBuilder.AppendFormat("{0} ", output[i]);
 
+            //Show the data in the text box
             textBox_testOutput.Text = outputStringBuilder.ToString();
         }
 
+        //This function tests the serial functionality of the Neural Network object.
+        //This can be useful if a particularly great neural network is consturcted and should be saved/loaded.
         private void button_testSerialization_Click(object sender, EventArgs e)
         {
+            //Save the neural network created when this object was built
             testNN.SaveNNToFile("testNN.dat");
+            //Load a new neural network from that file
             NN loadedNN = NN.LoadNNFromFile("testNN.dat");
+            //Using the custom equals function, test to see if the networks are equal then show the results.
             if (loadedNN.Equals(testNN))
                 MessageBox.Show("Serialization Test Succeeded. Saved Object Is Identical To Original.");
             else
                 MessageBox.Show("Serialization Test Failed. Saved Object Is Not Identical To Original.");
         }
 
-        private NNPopulation pop = new NNPopulation(100, new int[] { 4, 6, 6, 2 });
+        //This function will run a test simulation in an attempt to see if the population object
+        //runs as expected.
         private void button_runGenerations_Click(object sender, EventArgs e)
         {
+            //Store the start time for benchmarking purposes
             DateTime before = DateTime.Now;
+
+            //Set the word wrap state to true
+            richTextBox_simpleOut.WordWrap = true;
+
+            //Create a string builder for output
+            StringBuilder outputBuilder = new StringBuilder();
+
+            //Iterate the simulation 100 times
             for (int j = 0; j < 100; j++)
             {
+                //Run a single generation in the simulation
                 pop.RunGeneration();
+
+                //Clear the output field
                 richTextBox_simpleOut.Clear();
-                richTextBox_simpleOut.WordWrap = true;
-                StringBuilder outputBuilder = new StringBuilder();
+                
+                //Fill the output string builder with the fitness data from this generation
                 for (int i = 0; i < pop.LatestFitness.Length; i++)
                     outputBuilder.AppendFormat("{0} ", pop.LatestFitness[i]);
+
+                //Output the fitness data
                 richTextBox_simpleOut.Text = outputBuilder.ToString();
+
+                //Reset the output builder
+                outputBuilder.Clear();
             }
+
+            //Store the end time of the simulation
             DateTime after = DateTime.Now;
+
+            //Show a message box with the total seconds it took to run the complete program
             MessageBox.Show("Seconds: " + after.Subtract(before).TotalSeconds);
         }
+
+        #endregion
     }
 }

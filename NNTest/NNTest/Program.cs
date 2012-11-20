@@ -15,6 +15,7 @@ namespace NNTest
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            //The network testing application is the main form
             Application.Run(new NetworkTester());
         }
     }

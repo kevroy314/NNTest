@@ -5,43 +5,74 @@ using System.Text;
 
 namespace NNTest
 {
+    //This class represents a population of neural networks which can breed, mutate, and evaluate their fitness
     class NNPopulation
     {
-        private static Random randNumGen = new Random();
+        #region Constant Values
 
-        private List<NN> population;
-        private int[] networkStructure;
-        private int[] hiddenLayerStructure;
-        private int startPopulationSize;
-        private double[] latestFitness;
+        //The number of iterations the NNPopulationSimulation which calculates the fitness should run
+        private const int numFitnessSimulationIterations = 500;
+
+        #endregion
+
+        #region Member Variables
+
+        //These variables are used to manage the competition and evolution of the neural networks
+        private List<NN> population; //The list of neural networks, and the population for the simulation
+        private int[] networkStructure; //The structure of the neural networks
+        private int[] hiddenLayerStructure; //The hidden layer structure of the neural networks
+        private int startPopulationSize; //The starting population size of the genetic algorithm
+        private double[] latestFitness; //The latest fitness of the genetic algorithm while processing
+
+        #endregion
+
+        #region Constructors
 
         public NNPopulation(int startingPopulationSize, int[] neuralNetworkLayerSizes)
         {
+            //Populate the input variables
             networkStructure = neuralNetworkLayerSizes;
             startPopulationSize = startingPopulationSize;
 
+            //Generate the hidden layer structure from the input network structure
             int[] hiddenLayers = new int[neuralNetworkLayerSizes.Length - 2];
             for(int i = 0; i < hiddenLayers.Length;i++)
                 hiddenLayers[i] = neuralNetworkLayerSizes[i+1];
             hiddenLayerStructure = hiddenLayers;
 
+            //Create the population list
             population = new List<NN>();
 
+            //Generate nerual networks for the genetic algorithm to use to compete
             for (int i = 0; i < startingPopulationSize; i++)
                 population.Add(new NN(neuralNetworkLayerSizes[0], neuralNetworkLayerSizes[neuralNetworkLayerSizes.Length - 1], neuralNetworkLayerSizes.Length - 2, hiddenLayers));
         }
 
+        #endregion
+
         #region Genetic Functions
 
-        public double[] CalculateFitness()
+        //The fitness function requires the user to select a type which they can use to create a simulation.
+        //This type must implement NNPopulationSimulation.
+        public double[] CalculateFitness(Type simulationType)
         {
-            NNPopulationSimulation sim = new NNAntSimulation(population.Count);
-            ((NNAntSimulation)sim).Show();
-            double[] output = sim.RunPopulationSimulation(population, 500);
-            ((NNAntSimulation)sim).Close();
+            //Create an instance of a NNPopulationSimulation of the specified type
+            NNPopulationSimulation sim = (NNPopulationSimulation)Activator.CreateInstance(simulationType, new object[] { population.Count });
+
+            //Show the simulation (the simulation may choose to not perform any operations on this call
+            sim.ShowSimulation();
+
+            //Run the simulation on the current population for a set number of iterations
+            double[] output = sim.RunPopulationSimulation(population, numFitnessSimulationIterations);
+
+            //Close the simulation if it requires that
+            sim.CloseSimulation();
+
+            //Return the simulation output
             return output;
         }
 
+        //CONTINUE DOCUMENTING HERE!
         //Need correct selection method
         public Tuple<int, int>[] SelectCouplesToBreed(double[] fitnesses)
         {
@@ -73,11 +104,11 @@ namespace NNTest
 
         public void Mutate(double weightMutationProbability, int minNumberOfMutations, int maxNumberOfMutations, double weightMutationIntensityRange)
         {
-            int numberOfMutations = randNumGen.Next(minNumberOfMutations,maxNumberOfMutations);
+            int numberOfMutations = Util.randNumGen.Next(minNumberOfMutations,maxNumberOfMutations);
             for (int i = 0; i < population.Count; i++)
                 for(int j = 0; j < numberOfMutations;j++)
-                    if(randNumGen.NextDouble() <= weightMutationProbability)
-                        population[i].Weights[randNumGen.Next(0, population[i].Weights.Length - 1)] += (randNumGen.NextDouble() * weightMutationIntensityRange) - (randNumGen.NextDouble() * weightMutationIntensityRange);
+                    if (Util.randNumGen.NextDouble() <= weightMutationProbability)
+                        population[i].Weights[Util.randNumGen.Next(0, population[i].Weights.Length - 1)] += (Util.randNumGen.NextDouble() * weightMutationIntensityRange) - (Util.randNumGen.NextDouble() * weightMutationIntensityRange);
         }
 
         public void RunGeneration()
