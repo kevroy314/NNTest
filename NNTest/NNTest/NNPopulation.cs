@@ -86,7 +86,7 @@ namespace NNTest
             fitList.Reverse();
 
             //Get the number of top networks to breed
-            int numToBreed = (int)Math.Floor(Math.Sqrt((double)fitnesses.Length * 1.7));
+            int numToBreed = (int)Math.Floor(Math.Sqrt((double)fitnesses.Length * 1.8));
 
             //Create a counter for the breeding index
             int breedVal = 0;

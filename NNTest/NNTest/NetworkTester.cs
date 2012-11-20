@@ -25,6 +25,8 @@ namespace NNTest
         //This bool will be used to request the simThread be stopped
         private bool requestStop;
 
+        private List<Keys> pressedKeys;
+
         #endregion
 
         #region Constructors
@@ -37,7 +39,7 @@ namespace NNTest
             testNN = new NN(2, 1, 1, new int[] { 1 });
 
             //Build a test population with 100 members and a 4 layer network with 4 inputs, 2 outputs, and 2 hidden layers with 6 nodes each
-            pop = new NNPopulation(100, new int[] { 4, 6, 6, 2 });
+            pop = new NNPopulation(30, new int[] { 4, 10, 10, 10, 2 });
 
             //Output the default object test results
             richTextBox_simpleOut.Text = getTestDataString();
@@ -46,6 +48,15 @@ namespace NNTest
             simThread = new Thread(new ThreadStart(runGeneticSimulation));
             //No stop is request at the beginning of execution
             requestStop = false;
+
+            pressedKeys = new List<Keys>();
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Escape)
+                requestStop = true;
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         #endregion
@@ -114,14 +125,15 @@ namespace NNTest
 
         private void runGeneticSimulation()
         {
+            this.Enabled = false;
+
+            this.button_runGenerations.Text = "Click Escape to Abort";
+
             //The simulation is not aborted by default
             bool aborted = false;
 
             //Store the start time for benchmarking purposes
             DateTime before = DateTime.Now;
-
-            //Set the word wrap state to true
-            richTextBox_simpleOut.WordWrap = true;
 
             //Create a string builder for output
             StringBuilder outputBuilder = new StringBuilder();
@@ -146,6 +158,9 @@ namespace NNTest
                 chart.Series["Max"].Points.AddY(maxFitness);
                 chart.Update();
 
+                label_iteration.Text = "Iteration: " + (j + 1) + "/" + numericUpDown_numGenerations.Value;
+                this.Update();
+
                 //Clear the output field
                 richTextBox_simpleOut.Clear();
 
@@ -164,21 +179,24 @@ namespace NNTest
                 {
                     //Flag the exit as an abort
                     aborted = true;
-                    
+
+                    requestStop = false;
+
                     //Break out of the loop
                     break;
                 }
             }
 
+            this.Enabled = true;
+            this.button_runGenerations.Text = "Run Generations";
             //Store the end time of the simulation
             DateTime after = DateTime.Now;
 
-            //If the function completes in an non-aborted state, show the benchmark time
-            if (!aborted)
-                //Show a message box with the total seconds it took to run the complete program
-                MessageBox.Show("Seconds: " + after.Subtract(before).TotalSeconds);
-            else
-                MessageBox.Show("Aborted Successfully!");
+            //Show a message box with the total seconds it took to run the complete program
+            label_iteration.Text += ", Seconds: " + after.Subtract(before).TotalSeconds;
+
+            this.Update();
+            this.Refresh();
         }
 
         #endregion
@@ -273,7 +291,12 @@ namespace NNTest
                 ((Button)sender).Text = "Stop Generations";
             }
              * */
-            runGeneticSimulation();
+            //Set the word wrap state to true
+            richTextBox_simpleOut.WordWrap = true;
+            //Fill the simThread with a default value (not running)
+            simThread = new Thread(new ThreadStart(runGeneticSimulation));
+            simThread.Start();
+            //runGeneticSimulation();
         }
 
         #endregion

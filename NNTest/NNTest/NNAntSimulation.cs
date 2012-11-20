@@ -21,7 +21,10 @@ namespace NNTest
         private const int foodCount = 100;
 
         //The distance at which food may be captured (in pixels) by an ant
-        private const double minFoodCaptureDist = 2;
+        private const double minFoodCaptureDist = 10;
+
+        private const int foodSize = 3;
+        private const int antSize = 10;
 
         #endregion
 
@@ -122,11 +125,11 @@ namespace NNTest
 
                     //Draw the food rectangles
                     for (int j = 0; j < food.Count; j++)
-                        g.FillRectangle(Brushes.Red, food[j].X, food[j].Y, 1, 1);
+                        g.FillRectangle(Brushes.Red, food[j].X-foodSize/2, food[j].Y-foodSize/2, foodSize, foodSize);
 
                     //Draw the ant circles
                     for (int j = 0; j < location.Length; j++)
-                        g.FillEllipse(Brushes.Blue, location[j].X, location[j].Y, 2, 2);
+                        g.FillEllipse(Brushes.Blue, location[j].X-antSize/2, location[j].Y-antSize/2, antSize, antSize);
 
                     //Draw the buffer to the form
                     finalG.DrawImage(buffer, 0, 0);
