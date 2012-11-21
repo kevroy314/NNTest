@@ -25,8 +25,6 @@ namespace NNTest
         //This bool will be used to request the simThread be stopped
         private bool requestStop;
 
-        private List<Keys> pressedKeys;
-
         #endregion
 
         #region Constructors
@@ -48,9 +46,9 @@ namespace NNTest
             simThread = new Thread(new ThreadStart(runGeneticSimulation));
             //No stop is request at the beginning of execution
             requestStop = false;
-
-            pressedKeys = new List<Keys>();
         }
+
+        #endregion
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
@@ -58,8 +56,6 @@ namespace NNTest
                 requestStop = true;
             return base.ProcessCmdKey(ref msg, keyData);
         }
-
-        #endregion
 
         #region Internal Test Functions
 
@@ -125,9 +121,9 @@ namespace NNTest
 
         private void runGeneticSimulation()
         {
-            this.Enabled = false;
+            SetFormEnabled(false);
 
-            this.button_runGenerations.Text = "Click Escape to Abort";
+            SetRunGenerationsButtonText("Click Escape to Abort");
 
             //The simulation is not aborted by default
             bool aborted = false;
@@ -154,22 +150,21 @@ namespace NNTest
                     sum += latestFitness[i];
                 }
 
-                chart.Series["Average"].Points.AddY(sum / latestFitness.Length);
-                chart.Series["Max"].Points.AddY(maxFitness);
-                chart.Update();
+                AddChartElements(sum / latestFitness.Length, maxFitness);
 
-                label_iteration.Text = "Iteration: " + (j + 1) + "/" + numericUpDown_numGenerations.Value;
-                this.Update();
+                SetIterationLabelText("Iteration: " + (j + 1) + "/" + numericUpDown_numGenerations.Value);
+
+                UpdateForm();
 
                 //Clear the output field
-                richTextBox_simpleOut.Clear();
+                ClearSimpleOutRichTextBoxBox();
 
                 //Fill the output string builder with the fitness data from this generation
                 for (int i = 0; i < pop.LatestFitness.Length; i++)
                     outputBuilder.AppendFormat("{0} ", pop.LatestFitness[i]);
 
                 //Output the fitness data
-                richTextBox_simpleOut.Text = outputBuilder.ToString();
+                SetSimpleOutRichTextBoxBoxText(outputBuilder.ToString());
 
                 //Reset the output builder
                 outputBuilder.Clear();
@@ -187,19 +182,134 @@ namespace NNTest
                 }
             }
 
-            this.Enabled = true;
-            this.button_runGenerations.Text = "Run Generations";
+            SetFormEnabled(true);
+            SetRunGenerationsButtonText("Run Generations");
+
             //Store the end time of the simulation
             DateTime after = DateTime.Now;
 
             //Show a message box with the total seconds it took to run the complete program
-            label_iteration.Text += ", Seconds: " + after.Subtract(before).TotalSeconds;
+            SetIterationLabelText(label_iteration.Text + ", Seconds: " + after.Subtract(before).TotalSeconds);
 
-            this.Update();
-            this.Refresh();
+            UpdateForm();
+            RefreshForm();
         }
 
         #endregion
+
+        delegate void SetFormEnabledCallback(bool state);
+        private void SetFormEnabled(bool state)
+        {
+            if (this.InvokeRequired)
+            {
+                SetFormEnabledCallback c = new SetFormEnabledCallback(SetFormEnabled);
+                this.Invoke(c, new object[] { state });
+            }
+            else
+            {
+                this.Enabled = state;
+            }
+        }
+
+        delegate void SetRunGenerationsButtonTextCallback(string text);
+        private void SetRunGenerationsButtonText(string text)
+        {
+            if (this.button_runGenerations.InvokeRequired)
+            {
+                SetRunGenerationsButtonTextCallback c = new SetRunGenerationsButtonTextCallback(SetRunGenerationsButtonText);
+                this.Invoke(c, new object[] { text });
+            }
+            else
+            {
+                this.button_runGenerations.Text = text;
+            }
+        }
+
+        delegate void AddChartElementsCallback(double average, double max);
+        private void AddChartElements(double average, double max)
+        {
+            if (this.chart.InvokeRequired)
+            {
+                AddChartElementsCallback c = new AddChartElementsCallback(AddChartElements);
+                this.Invoke(c, new object[] { average, max });
+            }
+            else
+            {
+                chart.Series["Average"].Points.AddY(average);
+                chart.Series["Max"].Points.AddY(max);
+                chart.Update();
+            }
+        }
+
+        delegate void SetIterationLabelTextCallback(string text);
+        private void SetIterationLabelText(string text)
+        {
+            if (this.label_iteration.InvokeRequired)
+            {
+                SetIterationLabelTextCallback c = new SetIterationLabelTextCallback(SetIterationLabelText);
+                this.Invoke(c, new object[] { text });
+            }
+            else
+            {
+                label_iteration.Text = text;
+            }
+        }
+
+        delegate void UpdateFormCallback();
+        private void UpdateForm()
+        {
+            if (this.InvokeRequired)
+            {
+                UpdateFormCallback c = new UpdateFormCallback(UpdateForm);
+                this.Invoke(c, new object[] { });
+            }
+            else
+            {
+                this.Update();
+            }
+        }
+
+        delegate void RefreshFormCallback();
+        private void RefreshForm()
+        {
+            if (this.InvokeRequired)
+            {
+                RefreshFormCallback c = new RefreshFormCallback(RefreshForm);
+                this.Invoke(c, new object[] { });
+            }
+            else
+            {
+                this.Refresh();
+            }
+        }
+
+        delegate void ClearSimpleOutRichTextBoxBoxCallback();
+        private void ClearSimpleOutRichTextBoxBox()
+        {
+            if (this.richTextBox_simpleOut.InvokeRequired)
+            {
+                ClearSimpleOutRichTextBoxBoxCallback c = new ClearSimpleOutRichTextBoxBoxCallback(ClearSimpleOutRichTextBoxBox);
+                this.Invoke(c, new object[] { });
+            }
+            else
+            {
+                this.richTextBox_simpleOut.Clear();
+            }
+        }
+
+        delegate void SetSimpleOutRichTextBoxBoxTextCallback(string text);
+        private void SetSimpleOutRichTextBoxBoxText(string text)
+        {
+            if (this.richTextBox_simpleOut.InvokeRequired)
+            {
+                SetSimpleOutRichTextBoxBoxTextCallback c = new SetSimpleOutRichTextBoxBoxTextCallback(SetSimpleOutRichTextBoxBoxText);
+                this.Invoke(c, new object[] { text });
+            }
+            else
+            {
+                this.richTextBox_simpleOut.Text = text;
+            }
+        }
 
         #region Button Click Event Callbacks
 

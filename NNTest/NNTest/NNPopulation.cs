@@ -58,7 +58,7 @@ namespace NNTest
         {
             //Create an instance of a NNPopulationSimulation of the specified type
             NNPopulationSimulation sim = (NNPopulationSimulation)Activator.CreateInstance(simulationType, new object[] { population.Count });
-            
+
             if(showSimulation)
             //Show the simulation (the simulation may choose to not perform any operations on this call
             sim.ShowSimulation();
@@ -151,12 +151,10 @@ namespace NNTest
         public void RunGeneration(Type simulationType, bool showSimulation)
         {
             //Calculate the fitnesses of a given simiulation, this simulation must implement NNPopulationSimulation
-            double[] fitnesses = CalculateFitness(simulationType, showSimulation);
-            //Set the latest fitness
-            latestFitness = fitnesses;
+            latestFitness = CalculateFitness(simulationType, showSimulation);
 
             //Select the breeding couples given their fitness
-            Tuple<int,int>[] breedingCouples = SelectCouplesToBreed(fitnesses);
+            Tuple<int,int>[] breedingCouples = SelectCouplesToBreed(latestFitness);
 
             //Breed the selected couples
             population = Breed(breedingCouples);
