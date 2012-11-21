@@ -10,8 +10,25 @@ namespace NNTest
     {
         #region Constant Values
 
-        //The number of iterations the NNPopulationSimulation which calculates the fitness should run
-        private const int numFitnessSimulationIterations = 1000;
+        //The number of iterations the NNPopulationSimulation which calculates the fitness should run (range 1-inf)
+        private const int numFitnessSimulationIterations = 2000;
+
+        //This probability will decide how likely it is a genes will mutate if it is selected to mutate (range 0-1)
+        private const double probabilityOfWeightMutationIfChosenToMutate = 0.05;
+        //This proportion determines the minimum number of genes that could mutate as a proprtion of the total number of genes (range 0-1)
+        private const double minimumProportionOfMutationsPerPopulationMember = 0;
+        //This proportion determines the maximum number of genes that could mutate as a proportion of the total number of genes (range 0-1)
+        private const double maximumProportionOfMutationsPerPopulationMember = 1;
+        //This range determines the maximum and minimum amount each gene will mutate if chosen to mutate (range -inf-inf)
+        private const double rangeOfMutationIfChosenToMutate = 0.5;
+
+        //This weight determines the amount of genetic material the first parent will contribute (range 0-1, firstParentBreedingWeight + secondParentBreedingWeight should equal 1 to avoid unintended mutation)
+        private const double firstParentBreedingWeight = 0.5;
+        //This weight determines the amount of genetic material the second parent will contribute (range 0-1, firstParentBreedingWeight + secondParentBreedingWeight should equal 1 to avoid unintended mutation)
+        private const double secondParentBreedingWeight = 0.5;
+
+        //This proportion determines the amount of entities which will breed randomly of the top fitness entities (range 0-1)
+        private const double proportionToBreed = 0.2;
 
         #endregion
 
@@ -74,39 +91,47 @@ namespace NNTest
             return output;
         }
 
-        //NOTE: BROKEN!
+        //This function selects the couples which should breed.
         public Tuple<int, int>[] SelectCouplesToBreed(double[] fitnesses)
         {
+            //Build an output array
             Tuple<int,int>[] output = new Tuple<int,int>[fitnesses.Length];
 
+            //Create a list of fitness/index combinations and populate it with the fitnesses of members of the population.
             List<KeyValuePair<int, double>> fitList = new List<KeyValuePair<int, double>>();
             for (int i = 0; i < fitnesses.Length; i++)
                 fitList.Add(new KeyValuePair<int, double>(i, fitnesses[i]));
+
+            //Sort the list (will put it in ascending order)
             fitList.Sort((firstPair, nextPair) => { return firstPair.Value.CompareTo(nextPair.Value); });
+
+            //Reverse the list so that index 0 is the most successful index.
             fitList.Reverse();
 
             //Get the number of top networks to breed
-            int numToBreed = (int)Math.Floor(Math.Sqrt((double)fitnesses.Length * 1.8));
+            int numToBreed = (int)(proportionToBreed * population.Count);
 
-            //Create a counter for the breeding index
-            int breedVal = 0;
+            //Create a list of potentially breedable couples
+            List<Tuple<int, int>> potentialBreeders = new List<Tuple<int, int>>();
 
             //Loop through the triangular combination of the top numToBreed candidates
             for (int i = 0; i < numToBreed; i++)
                 for (int j = i; j < numToBreed; j++)
-                {
                     //Select their indicies
-                    output[breedVal] = new Tuple<int, int>(fitList[i].Key, fitList[j].Key);
-                    //Iterate the breed counter
-                    breedVal++;
-                }
+                    potentialBreeders.Add(new Tuple<int, int>(fitList[i].Key, fitList[j].Key));
 
-            //Fill the remaining values with random breeding with the top candidate
-            while (breedVal < fitnesses.Length)
+            //Randomly shuffle via inside out Knuth Shuffle
+            for (int i = 0; i < potentialBreeders.Count; i++)
             {
-                output[breedVal] = new Tuple<int, int>(fitList[0].Key, fitList[Util.randNumGen.Next(0, fitList.Count - 1)].Key);
-                breedVal++;
+                int rand = Util.randNumGen.Next(0, potentialBreeders.Count - 1);
+                Tuple<int, int> tmp = potentialBreeders[i];
+                potentialBreeders[i] = potentialBreeders[rand];
+                potentialBreeders[rand] = tmp;
             }
+
+            //Pull out the selected breeders, if there are not enough potential breeders to produce the appropriate number of offspring, loop back around and use the same breeders again.
+            for (int i = 0; i < output.Length; i++)
+                output[i] = potentialBreeders[i % potentialBreeders.Count];
 
             return output;
         }
@@ -125,7 +150,7 @@ namespace NNTest
 
                 //For each weight in the breeding couple, average the weights of the parents to create the child weights
                 for (int j = 0; j < newPopulation[i].Weights.Length; j++)
-                    newPopulation[i].Weights[j] = (population[couples[i].Item1].Weights[j] + population[couples[i].Item2].Weights[j]) / 2;
+                    newPopulation[i].Weights[j] = (population[couples[i].Item1].Weights[j] * firstParentBreedingWeight + population[couples[i].Item2].Weights[j] * secondParentBreedingWeight);
             }
             
             //Return the new population
@@ -160,7 +185,7 @@ namespace NNTest
             population = Breed(breedingCouples);
 
             //Mutate the new population
-            Mutate(0.05, 0, (int)((double)population.Count * 0.5), 0.5);
+            Mutate(probabilityOfWeightMutationIfChosenToMutate, (int)(((double)population.Count) * minimumProportionOfMutationsPerPopulationMember), (int)(((double)population.Count) * maximumProportionOfMutationsPerPopulationMember), rangeOfMutationIfChosenToMutate);
         }
 
         #endregion

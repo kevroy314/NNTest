@@ -12,6 +12,16 @@ namespace NNTest
 {
     public partial class NetworkTester : Form
     {
+        #region Constant Values
+
+        //The number of entities to be used in the population simulation
+        private const int simulationPopulationSize = 30;
+
+        //The structure of their brains
+        private int[] neuralNetworkStructure = { 4, 10, 10, 10, 2 };
+
+        #endregion
+
         #region Member Variables
 
         //An internal neural network which is created purely for testing without an application
@@ -33,11 +43,11 @@ namespace NNTest
         {
             InitializeComponent();
 
-            //Initial the network to have 4 inputs, 2 outputs and 1 hidden layer with 6 nodes
-            testNN = new NN(2, 1, 1, new int[] { 1 });
+            //Initialize a test network
+            testNN = new NN(4, 2, 1, new int[] { 6 });
 
-            //Build a test population with 100 members and a 4 layer network with 4 inputs, 2 outputs, and 2 hidden layers with 6 nodes each
-            pop = new NNPopulation(30, new int[] { 4, 10, 10, 10, 2 });
+            //Build a test population
+            pop = new NNPopulation(simulationPopulationSize, neuralNetworkStructure);
 
             //Output the default object test results
             richTextBox_simpleOut.Text = getTestDataString();
@@ -50,12 +60,19 @@ namespace NNTest
 
         #endregion
 
+        #region Keyboard Event Callbacks
+
+        //This will capture KeyDown events anywhere in the form
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
+            //If the key is Escape
             if (keyData == Keys.Escape)
+                //Request that the simulation loop thread stop
                 requestStop = true;
             return base.ProcessCmdKey(ref msg, keyData);
         }
+
+        #endregion
 
         #region Internal Test Functions
 
@@ -121,8 +138,8 @@ namespace NNTest
 
         private void runGeneticSimulation()
         {
+            //Disable the form and change the button text
             SetFormEnabled(false);
-
             SetRunGenerationsButtonText("Click Escape to Abort");
 
             //The simulation is not aborted by default
@@ -140,8 +157,10 @@ namespace NNTest
                 //Run a single generation in the neural network ant simulation
                 pop.RunGeneration(typeof(NNAntSimulation), checkBox_showSimulation.Checked);
 
+                //Get the latest fitness array from the simulation
                 double[] latestFitness = pop.LatestFitness;
 
+                //Find hte maximum fitness
                 double maxFitness = -1;
                 double sum = 0;
                 for (int i = 0; i < latestFitness.Length; i++)
@@ -150,10 +169,13 @@ namespace NNTest
                     sum += latestFitness[i];
                 }
 
+                //Update the chart
                 AddChartElements(sum / latestFitness.Length, maxFitness);
 
+                //Update the iteration table
                 SetIterationLabelText("Iteration: " + (j + 1) + "/" + numericUpDown_numGenerations.Value);
 
+                //Repaint the form
                 UpdateForm();
 
                 //Clear the output field
@@ -182,6 +204,7 @@ namespace NNTest
                 }
             }
 
+            //Reenable the form and set the button text
             SetFormEnabled(true);
             SetRunGenerationsButtonText("Run Generations");
 
@@ -191,12 +214,16 @@ namespace NNTest
             //Show a message box with the total seconds it took to run the complete program
             SetIterationLabelText(label_iteration.Text + ", Seconds: " + after.Subtract(before).TotalSeconds);
 
+            //Finally update and refresh the form
             UpdateForm();
             RefreshForm();
         }
 
         #endregion
 
+        #region Thread Safe Delegates and Functions for ITC
+
+        //For setting the enable state of the form
         delegate void SetFormEnabledCallback(bool state);
         private void SetFormEnabled(bool state)
         {
@@ -211,6 +238,7 @@ namespace NNTest
             }
         }
 
+        //For setting the Run Generations button text
         delegate void SetRunGenerationsButtonTextCallback(string text);
         private void SetRunGenerationsButtonText(string text)
         {
@@ -225,6 +253,7 @@ namespace NNTest
             }
         }
 
+        //For adding an element to the chart
         delegate void AddChartElementsCallback(double average, double max);
         private void AddChartElements(double average, double max)
         {
@@ -241,6 +270,7 @@ namespace NNTest
             }
         }
 
+        //For setting the iteration label text
         delegate void SetIterationLabelTextCallback(string text);
         private void SetIterationLabelText(string text)
         {
@@ -255,6 +285,7 @@ namespace NNTest
             }
         }
 
+        //For forcing an update of the form
         delegate void UpdateFormCallback();
         private void UpdateForm()
         {
@@ -269,6 +300,7 @@ namespace NNTest
             }
         }
 
+        //For forcing a refresh of the form
         delegate void RefreshFormCallback();
         private void RefreshForm()
         {
@@ -283,6 +315,7 @@ namespace NNTest
             }
         }
 
+        //For clearing the simple output rich text box
         delegate void ClearSimpleOutRichTextBoxBoxCallback();
         private void ClearSimpleOutRichTextBoxBox()
         {
@@ -297,6 +330,7 @@ namespace NNTest
             }
         }
 
+        //For setting the text in the simple out rich text box
         delegate void SetSimpleOutRichTextBoxBoxTextCallback(string text);
         private void SetSimpleOutRichTextBoxBoxText(string text)
         {
@@ -311,11 +345,16 @@ namespace NNTest
             }
         }
 
+        #endregion
+
         #region Button Click Event Callbacks
 
         //This function executes a basic input/output tests on the neural network
         private void button_testRun_Click(object sender, EventArgs e)
         {
+            //Set the word wrap to false so we can know what line represents what
+            richTextBox_simpleOut.WordWrap = false;
+
             //Get the input tokens from the user
             string[] tokens = textBox_testInput.Text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -366,6 +405,7 @@ namespace NNTest
             testNN.SaveNNToFile("testNN.dat");
             //Load a new neural network from that file
             NN loadedNN = NN.LoadNNFromFile("testNN.dat");
+
             //Using the custom equals function, test to see if the networks are equal then show the results.
             if (loadedNN.Equals(testNN))
                 MessageBox.Show("Serialization Test Succeeded. Saved Object Is Identical To Original.");
@@ -377,36 +417,27 @@ namespace NNTest
         //runs as expected.
         private void button_runGenerations_Click(object sender, EventArgs e)
         {
-            /*
-            //If the thread is alive
-            if (simThread.IsAlive)
-            {
-                //Request an abort and change the text
-                requestStop = true;
-                //Wait until it is complete
-                //while (simThread.IsAlive) ;
-                //Change the button text back to the start text
-                ((Button)sender).Text = "Run Generations";
-            }
-            //If the thread is dead
-            else
-            {
-                //Reset the stop request
-                requestStop = false;
-                //Make a new thread object instance for the runGeneticSimulation
-                simThread = new Thread(new ThreadStart(runGeneticSimulation));
-                //Start the simulation
-                simThread.Start();
-                //Change the button text to the stop text
-                ((Button)sender).Text = "Stop Generations";
-            }
-             * */
-            //Set the word wrap state to true
+
+            //Set the word wrap state to true so we can see the lists more easily
             richTextBox_simpleOut.WordWrap = true;
+
             //Fill the simThread with a default value (not running)
             simThread = new Thread(new ThreadStart(runGeneticSimulation));
             simThread.Start();
-            //runGeneticSimulation();
+        }
+
+        //This function is a callback for the reset button for the simulation
+        private void button_reset_Click(object sender, EventArgs e)
+        {
+            //Clear the chart
+            for (int i = 0; i < chart.Series.Count; i++)
+                chart.Series[i].Points.Clear();
+
+            //Clear the iteration text
+            label_iteration.Text = "Iteration: ";
+
+            //Build a test population
+            pop = new NNPopulation(simulationPopulationSize, neuralNetworkStructure);
         }
 
         #endregion

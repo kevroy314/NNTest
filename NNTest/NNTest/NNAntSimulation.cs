@@ -21,10 +21,17 @@ namespace NNTest
         private const int foodCount = 100;
 
         //The distance at which food may be captured (in pixels) by an ant
-        private const double minFoodCaptureDist = 10;
+        private const double minFoodCaptureDist = 5;
 
+        //The display size of the food
         private const int foodSize = 3;
+        //The display size of the ant
         private const int antSize = 10;
+
+        //The display Brush of the food
+        private Brush foodBrush = Brushes.Red;
+        //The display Brush of the ant
+        private Brush antBrush = Brushes.Blue;
 
         #endregion
 
@@ -125,11 +132,11 @@ namespace NNTest
 
                     //Draw the food rectangles
                     for (int j = 0; j < food.Count; j++)
-                        g.FillRectangle(Brushes.Red, food[j].X-foodSize/2, food[j].Y-foodSize/2, foodSize, foodSize);
+                        g.FillRectangle(foodBrush, food[j].X-foodSize/2, food[j].Y-foodSize/2, foodSize, foodSize);
 
                     //Draw the ant circles
                     for (int j = 0; j < location.Length; j++)
-                        g.FillEllipse(Brushes.Blue, location[j].X-antSize/2, location[j].Y-antSize/2, antSize, antSize);
+                        g.FillEllipse(antBrush, location[j].X-antSize/2, location[j].Y-antSize/2, antSize, antSize);
 
                     //Draw the buffer to the form
                     finalG.DrawImage(buffer, 0, 0);
@@ -167,7 +174,7 @@ namespace NNTest
 
                     //NOTE: THIS SECTION SHOULD BE CHANGED TO REFLECT MORE INPUTS WHICH COULD PRODUCE A MORE ROBUST NETWORK
                     //Generate the inputs for this iteration of the neural network
-                    double[] NNInput = new double[] { nearestFoodResult.Item1.X, nearestFoodResult.Item1.Y, directionVector[j].X,directionVector[j].Y};//,directionVector[j].X, directionVector[j].Y };
+                    double[] NNInput = new double[] { nearestFoodResult.Item1.X, nearestFoodResult.Item1.Y, directionVector[j].X,directionVector[j].Y};
 
                     //Compute the outputs from the neural network
                     double[] NNOutput = population[j].ComputeNNOutputs(NNInput);
@@ -187,10 +194,6 @@ namespace NNTest
                     //Wrap the ant location around the map so it represents a torus
                     location[j].X = (location[j].X + this.Width) % this.Width;
                     location[j].Y = (location[j].Y + this.Height) % this.Height;
-                    //if (location[j].X < 0) location[j].X = this.Width - 2;
-                    //else if (location[j].X > this.Width - 2) location[j].X = 0;
-                    //if (location[j].Y < 0) location[j].Y = this.Height - 2;
-                    //else if (location[j].Y > this.Height - 2) location[j].Y = 0;
                 }
 
                 //For each food vector which we need to remove because it was eaten
@@ -219,7 +222,6 @@ namespace NNTest
                 //Display the best score for one second
                 label.Text = "Done! Max Score: " + maxScore;
                 this.Update();
-                Thread.Sleep(1000);
             }
 
             //Return the scores from this round
