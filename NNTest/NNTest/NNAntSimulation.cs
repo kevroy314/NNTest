@@ -18,10 +18,10 @@ namespace NNTest
         #region Constant Values
 
         //The amount of food which should be in each simulation at the beginning of each iteration
-        private const int foodCount = 100;
+        private const int foodCount = 40;
 
         //The distance at which food may be captured (in pixels) by an ant
-        private const double minFoodCaptureDist = 5;
+        private const double minFoodCaptureDist = 7;
 
         //The display size of the food
         private const int foodSize = 3;
@@ -33,13 +33,20 @@ namespace NNTest
         //The display Brush of the ant
         private Brush antBrush = Brushes.Blue;
 
+        //Client Width is used at initialization of this class to determine the width in the designer
+        private const int clientWidth = 400;
+        //Client Height is used at initialization of this class to determine the height in the designer
+        private const int clientHeight = 400;
+
+        //Maximum amount of rotation the ant can have in any iteration
+        private const double maxRotationRate = 0.3;
+
         #endregion
 
         #region Member Variables
 
-        //Create two arrays representing the locations in space each ant lives as well as the direction they are facing
-        private Vector2[] directionVector;
-        private Vector2[] location;
+        //The array of ants containing their associated meta-data
+        private SimAnt[] ants;
 
         //Create a list of food locations. A list is used instead of an array so the adding and removing is handled cleanly for us.
         private List<Vector2> food;
@@ -60,17 +67,12 @@ namespace NNTest
             isShowing = false;
 
             //Initialize the positions and directions of all the ants
-            directionVector = new Vector2[populationSize];
-            location = new Vector2[populationSize];
+            ants = new SimAnt[populationSize];
 
-            for (int i = 0; i < populationSize; i++)
+            for (int i = 0; i < ants.Length; i++)
             {
-                //Use a random direction vector and normalize it (it is a direction after all)
-                directionVector[i] = new Vector2((float)Util.randNumGen.NextDouble(), (float)Util.randNumGen.NextDouble());
-                directionVector[i].Normalize();
-
-                //Initialize each location to some pixel location on the simulation draw area (in unit pixels)
-                location[i] = new Vector2(Util.randNumGen.Next(0, this.Width - 1), Util.randNumGen.Next(0, this.Height - 1));
+                //Create a random ant
+                ants[i] = new SimAnt(Util.randNumGen.NextDouble() * Math.PI * 2, 0, new Vector2(Util.randNumGen.Next(0, this.Width), Util.randNumGen.Next(0, this.Height)));
             }
 
             //Initialize the list of food
@@ -135,8 +137,8 @@ namespace NNTest
                         g.FillRectangle(foodBrush, food[j].X-foodSize/2, food[j].Y-foodSize/2, foodSize, foodSize);
 
                     //Draw the ant circles
-                    for (int j = 0; j < location.Length; j++)
-                        g.FillEllipse(antBrush, location[j].X-antSize/2, location[j].Y-antSize/2, antSize, antSize);
+                    for (int j = 0; j < ants.Length; j++)
+                        g.FillEllipse(antBrush, ants[j].Position.X - antSize / 2, ants[j].Position.Y - antSize / 2, antSize, antSize);
 
                     //Draw the buffer to the form
                     finalG.DrawImage(buffer, 0, 0);
@@ -154,7 +156,7 @@ namespace NNTest
                 for (int j = 0; j < population.Count; j++)
                 {
                     //Find the nearest food item
-                    Tuple<Vector2, double> nearestFoodResult = findNearestFoodLocationAndDistance(location[j]);
+                    Tuple<Vector2, double> nearestFoodResult = findNearestFoodLocationAndDistance(ants[j].Position);
 
                     //If the ant is near enough the food to capture it
                     if (nearestFoodResult.Item2 <= minFoodCaptureDist)
@@ -166,34 +168,38 @@ namespace NNTest
                     }
 
                     //Normalize the distance so we have a direction vector to the nearest food
-                    nearestFoodResult.Item1.Normalize();
-
-                    //Locally store the location of the current ant so we can manipulate it if needed
-                    Vector2 loc = location[j];
-                    //loc.Normalize();
+                    Vector2 foodDirection = nearestFoodResult.Item1;
+                    foodDirection.Normalize();
 
                     //NOTE: THIS SECTION SHOULD BE CHANGED TO REFLECT MORE INPUTS WHICH COULD PRODUCE A MORE ROBUST NETWORK
                     //Generate the inputs for this iteration of the neural network
-                    double[] NNInput = new double[] { nearestFoodResult.Item1.X, nearestFoodResult.Item1.Y, directionVector[j].X,directionVector[j].Y};
+                    double[] NNInput = new double[] { foodDirection.X,foodDirection.Y, ants[j].LookAt.X, ants[j].LookAt.Y};
 
                     //Compute the outputs from the neural network
                     double[] NNOutput = population[j].ComputeNNOutputs(NNInput);
 
-                    Vector2 travelVector = new Vector2((float)NNOutput[0] - location[j].X, (float)NNOutput[1] - location[j].Y);
-                    travelVector.Normalize();
+                    double rotationForce = NNOutput[0] - NNOutput[1];
 
-                    directionVector[j] = travelVector;
+                    if (rotationForce < -maxRotationRate)
+                        rotationForce = -maxRotationRate;
+                    else if (rotationForce > maxRotationRate)
+                        rotationForce = maxRotationRate;
 
-                    Vector2 moveVector = new Vector2((float)NNOutput[0], (float)NNOutput[1]);
-                    moveVector.Normalize();
+                    ants[j].Orientation += rotationForce;
+
+                    ants[j].Speed = (NNOutput[0] + NNOutput[1]);
+
+                    ants[j].LookAt = new Vector2(-(float)Math.Sin(ants[j].Orientation), (float)Math.Cos(ants[j].Orientation));
 
                     //Adjust the position of the ant relative to the neural network outputs
-                    location[j].X += moveVector.X;
-                    location[j].Y += moveVector.Y;
+                    float x = ants[j].LookAt.X * (float)ants[j].Speed + ants[j].Position.X;
+                    float y = ants[j].LookAt.Y * (float)ants[j].Speed + ants[j].Position.Y;
 
                     //Wrap the ant location around the map so it represents a torus
-                    location[j].X = (location[j].X + this.Width) % this.Width;
-                    location[j].Y = (location[j].Y + this.Height) % this.Height;
+                    x = (x + this.Width) % this.Width;
+                    y = (y + this.Height) % this.Height;
+
+                    ants[j].Position = new Vector2(x, y);
                 }
 
                 //For each food vector which we need to remove because it was eaten

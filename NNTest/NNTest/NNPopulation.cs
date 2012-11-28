@@ -14,13 +14,13 @@ namespace NNTest
         private const int numFitnessSimulationIterations = 2000;
 
         //This probability will decide how likely it is a genes will mutate if it is selected to mutate (range 0-1)
-        private const double probabilityOfWeightMutationIfChosenToMutate = 0.05;
+        private const double probabilityOfWeightMutationIfChosenToMutate = 0.1;
         //This proportion determines the minimum number of genes that could mutate as a proprtion of the total number of genes (range 0-1)
         private const double minimumProportionOfMutationsPerPopulationMember = 0;
         //This proportion determines the maximum number of genes that could mutate as a proportion of the total number of genes (range 0-1)
         private const double maximumProportionOfMutationsPerPopulationMember = 1;
         //This range determines the maximum and minimum amount each gene will mutate if chosen to mutate (range -inf-inf)
-        private const double rangeOfMutationIfChosenToMutate = 0.5;
+        private const double rangeOfMutationPerturbation = 0.3;
 
         //This weight determines the amount of genetic material the first parent will contribute (range 0-1, firstParentBreedingWeight + secondParentBreedingWeight should equal 1 to avoid unintended mutation)
         private const double firstParentBreedingWeight = 0.5;
@@ -185,7 +185,7 @@ namespace NNTest
             population = Breed(breedingCouples);
 
             //Mutate the new population
-            Mutate(probabilityOfWeightMutationIfChosenToMutate, (int)(((double)population.Count) * minimumProportionOfMutationsPerPopulationMember), (int)(((double)population.Count) * maximumProportionOfMutationsPerPopulationMember), rangeOfMutationIfChosenToMutate);
+            Mutate(probabilityOfWeightMutationIfChosenToMutate, (int)(((double)population.Count) * minimumProportionOfMutationsPerPopulationMember), (int)(((double)population.Count) * maximumProportionOfMutationsPerPopulationMember), rangeOfMutationPerturbation);
         }
 
         #endregion

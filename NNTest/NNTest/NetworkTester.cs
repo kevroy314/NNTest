@@ -18,7 +18,7 @@ namespace NNTest
         private const int simulationPopulationSize = 30;
 
         //The structure of their brains
-        private int[] neuralNetworkStructure = { 4, 10, 10, 10, 2 };
+        private int[] neuralNetworkStructure = { 4, 6, 2 };
 
         #endregion
 
