@@ -28,7 +28,7 @@ namespace NNTest
         private const double secondParentBreedingWeight = 0.5;
 
         //This proportion determines the amount of entities which will breed randomly of the top fitness entities (range 0-1)
-        private const double proportionToBreed = 0.2;
+        private const double proportionToBreed = 0.7;
 
         #endregion
 

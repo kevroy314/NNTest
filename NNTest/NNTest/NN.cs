@@ -11,6 +11,12 @@ namespace NNTest
     [Serializable]
     public class NN
     {
+        #region Constant Values
+
+        private const double activationResponse = 1;
+
+        #endregion
+
         #region Member Variables
 
         //Constructor Parameters
@@ -157,9 +163,15 @@ namespace NNTest
                 for (int j = 0; j < input.Length; j++) //For each input
                     output[i] += input[j] * weights[weightStartIndexPerLayerPerNode[layerNumber][i] + j]; //Add the weight value at the appropriate weight index given the layer number, node and input number
                 output[i] -= weights[weightStartIndexPerLayerPerNode[layerNumber][i] + input.Length]; //Add the bias weight*(-1) (i.e. subtract the bias weight) stored in the last index given the layer number and node
+                output[i] = sigmoid(output[i], activationResponse);
             }
 
             return output;
+        }
+
+        private double sigmoid(double x, double r)
+        {
+            return (1 / (1 + Math.Exp(-x / r)));
         }
 
         #endregion

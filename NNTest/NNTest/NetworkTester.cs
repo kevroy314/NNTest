@@ -142,9 +142,6 @@ namespace NNTest
             SetFormEnabled(false);
             SetRunGenerationsButtonText("Click Escape to Abort");
 
-            //The simulation is not aborted by default
-            bool aborted = false;
-
             //Store the start time for benchmarking purposes
             DateTime before = DateTime.Now;
 
@@ -172,8 +169,9 @@ namespace NNTest
                 //Update the chart
                 AddChartElements(sum / latestFitness.Length, maxFitness);
 
-                //Update the iteration table
+                //Update the iteration counters
                 SetIterationLabelText("Iteration: " + (j + 1) + "/" + numericUpDown_numGenerations.Value);
+                SetTotalIterationLabelText(chart.Series[0].Points.Count + " Total Iterations");
 
                 //Repaint the form
                 UpdateForm();
@@ -194,9 +192,7 @@ namespace NNTest
                 //If this function is running in the simulation thread and it was aborted
                 if (requestStop)
                 {
-                    //Flag the exit as an abort
-                    aborted = true;
-
+                    //Reset the stop request
                     requestStop = false;
 
                     //Break out of the loop
@@ -264,8 +260,33 @@ namespace NNTest
             }
             else
             {
-                chart.Series["Average"].Points.AddY(average);
-                chart.Series["Max"].Points.AddY(max);
+                //If this is the first point
+                if (chart.Series[0].Points.Count == 0)
+                {
+                    //Set the averages to the first point and set the points
+                    chart.Series["Average Moving Average"].Points.AddY(average);
+                    chart.Series["Average"].Points.AddY(average);
+                    chart.Series["Max Moving Average"].Points.AddY(max);
+                    chart.Series["Max"].Points.AddY(max);
+                }
+                //If there are fewer points than the window size
+                else if (chart.Series[0].Points.Count < (int)numericUpDown_movingAverageWindowSize.Value)
+                {
+                    //Average with the number of points as the window size and set the points
+                    chart.Series["Average Moving Average"].Points.AddY(Util.CalculateMovingAverage(chart.Series["Average Moving Average"].Points[chart.Series["Average Moving Average"].Points.Count - 1].YValues[0], average, chart.Series[0].Points.Count + 1));
+                    chart.Series["Average"].Points.AddY(average);
+                    chart.Series["Max Moving Average"].Points.AddY(Util.CalculateMovingAverage(chart.Series["Max Moving Average"].Points[chart.Series["Max Moving Average"].Points.Count - 1].YValues[0], max, chart.Series[0].Points.Count + 1));
+                    chart.Series["Max"].Points.AddY(max);
+                }
+                //If there are more points than the window size
+                else
+                {
+                    //Average with the window size and set the points
+                    chart.Series["Average Moving Average"].Points.AddY(Util.CalculateMovingAverage(chart.Series["Average Moving Average"].Points[chart.Series["Average Moving Average"].Points.Count - 1].YValues[0], average, (int)numericUpDown_movingAverageWindowSize.Value));
+                    chart.Series["Average"].Points.AddY(average);
+                    chart.Series["Max Moving Average"].Points.AddY(Util.CalculateMovingAverage(chart.Series["Max Moving Average"].Points[chart.Series["Max Moving Average"].Points.Count - 1].YValues[0], max, (int)numericUpDown_movingAverageWindowSize.Value));
+                    chart.Series["Max"].Points.AddY(max);
+                }
                 chart.Update();
             }
         }
@@ -282,6 +303,21 @@ namespace NNTest
             else
             {
                 label_iteration.Text = text;
+            }
+        }
+
+        //For setting the total iteration label text
+        delegate void SetTotalIterationLabelTextCallback(string text);
+        private void SetTotalIterationLabelText(string text)
+        {
+            if (this.label_iteration.InvokeRequired)
+            {
+                SetTotalIterationLabelTextCallback c = new SetTotalIterationLabelTextCallback(SetTotalIterationLabelText);
+                this.Invoke(c, new object[] { text });
+            }
+            else
+            {
+                label_totalIterations.Text = text;
             }
         }
 
@@ -347,7 +383,7 @@ namespace NNTest
 
         #endregion
 
-        #region Button Click Event Callbacks
+        #region Form Event Callbacks
 
         //This function executes a basic input/output tests on the neural network
         private void button_testRun_Click(object sender, EventArgs e)
@@ -438,6 +474,30 @@ namespace NNTest
 
             //Build a test population
             pop = new NNPopulation(simulationPopulationSize, neuralNetworkStructure);
+        }
+
+        //This function activates when the Show Simulation? check box is checked or unchecked. 
+        //It saves the previous value of the numGenerations control and disables it if it's being checked, and reverts it if unchecked.
+        //This prevents users from accidentally running a ton of visible simulations and prevents me from having to build a mechnisim which 
+        //aborts the simulation prematurely (or flags a series of simulations for abortion).
+        private void checkBox_showSimulation_CheckedChanged(object sender, EventArgs e)
+        {
+            if (((CheckBox)sender).Checked)
+            {
+                //The box was checked, save the current value
+                this.numericUpDown_numGenerations.Tag = this.numericUpDown_numGenerations.Value;
+                //Set the current value to 1
+                this.numericUpDown_numGenerations.Value = 1;
+                //Disable the control
+                this.numericUpDown_numGenerations.Enabled = false;
+            }
+            else
+            {
+                //The box was unchecked, revert the value
+                this.numericUpDown_numGenerations.Value = (decimal)this.numericUpDown_numGenerations.Tag;
+                //Enable the control
+                this.numericUpDown_numGenerations.Enabled = true;
+            }
         }
 
         #endregion
