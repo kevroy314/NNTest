@@ -159,7 +159,7 @@ namespace NNTest
                     Tuple<Vector2, double> nearestFoodResult = findNearestFoodLocationAndDistance(ants[j].Position);
 
                     //If the ant is near enough the food to capture it
-                    if (nearestFoodResult.Item2 <= minFoodCaptureDist)
+                    if (nearestFoodResult.Item2 < minFoodCaptureDist)
                     {
                         //Add the food to the list of food which needs to be replaced at the end of the round
                         foodToRemove.Add(nearestFoodResult.Item1);

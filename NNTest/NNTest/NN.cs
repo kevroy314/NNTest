@@ -13,7 +13,11 @@ namespace NNTest
     {
         #region Constant Values
 
+        //Used in the sigmoid function
         private const double activationResponse = 1;
+
+        //The bias for the network
+        private const double bias = -1;
 
         #endregion
 
@@ -162,7 +166,7 @@ namespace NNTest
                 output[i] = 0; //Set it's default output value to 0
                 for (int j = 0; j < input.Length; j++) //For each input
                     output[i] += input[j] * weights[weightStartIndexPerLayerPerNode[layerNumber][i] + j]; //Add the weight value at the appropriate weight index given the layer number, node and input number
-                output[i] -= weights[weightStartIndexPerLayerPerNode[layerNumber][i] + input.Length]; //Add the bias weight*(-1) (i.e. subtract the bias weight) stored in the last index given the layer number and node
+                output[i] += bias * weights[weightStartIndexPerLayerPerNode[layerNumber][i] + input.Length]; //Add the bias weight*(-1) (i.e. subtract the bias weight) stored in the last index given the layer number and node
                 output[i] = sigmoid(output[i], activationResponse);
             }
 
