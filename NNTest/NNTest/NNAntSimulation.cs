@@ -29,9 +29,11 @@ namespace NNTest
         private const int antSize = 10;
 
         //The display Brush of the food
-        private Brush foodBrush = Brushes.Red;
+        private Brush foodBrush = Brushes.Green;
         //The display Brush of the ant
         private Brush antBrush = Brushes.Blue;
+        //The display Brush of a highlighted ant
+        private Brush highlightedAntBrush = Brushes.Red;
 
         //Client Width is used at initialization of this class to determine the width in the designer
         private const int clientWidth = 400;
@@ -107,7 +109,7 @@ namespace NNTest
 
         //This is the primary overwritten function for the NNPopulationSimulation interface
         //It will run a simulation which will show the ants finding food, or simulate without display.
-        public double[] RunPopulationSimulation(List<NN> population, int numberOfIterations)
+        public double[] RunPopulationSimulation(List<NN> population, int numberOfIterations, int highlightIndiciesUnder)
         {
             //Generate an array in which the score will be output for each ant
             double[] score = new double[population.Count];
@@ -138,7 +140,10 @@ namespace NNTest
 
                     //Draw the ant circles
                     for (int j = 0; j < ants.Length; j++)
-                        g.FillEllipse(antBrush, ants[j].Position.X - antSize / 2, ants[j].Position.Y - antSize / 2, antSize, antSize);
+                        if(j<highlightIndiciesUnder)
+                            g.FillEllipse(highlightedAntBrush, ants[j].Position.X - antSize / 2, ants[j].Position.Y - antSize / 2, antSize, antSize);
+                        else
+                            g.FillEllipse(antBrush, ants[j].Position.X - antSize / 2, ants[j].Position.Y - antSize / 2, antSize, antSize);
 
                     //Draw the buffer to the form
                     finalG.DrawImage(buffer, 0, 0);

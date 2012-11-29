@@ -56,6 +56,10 @@ namespace NNTest
             simThread = new Thread(new ThreadStart(runGeneticSimulation));
             //No stop is request at the beginning of execution
             requestStop = false;
+
+            label_totalIterations.Text = "0 Total Iterations, Population Size: " + pop.StartPopulationSize;
+
+            comboBox_BreedingType.SelectedIndex = 0;
         }
 
         #endregion
@@ -152,7 +156,7 @@ namespace NNTest
             for (int j = 0; j < numericUpDown_numGenerations.Value; j++)
             {
                 //Run a single generation in the neural network ant simulation
-                pop.RunGeneration(typeof(NNAntSimulation), checkBox_showSimulation.Checked);
+                pop.RunGeneration(typeof(NNAntSimulation), checkBox_showSimulation.Checked, (NNPopulation.BreedingFunction)GetSelectedBreedingIndex());
 
                 //Get the latest fitness array from the simulation
                 double[] latestFitness = pop.LatestFitness;
@@ -171,7 +175,7 @@ namespace NNTest
 
                 //Update the iteration counters
                 SetIterationLabelText("Iteration: " + (j + 1) + "/" + numericUpDown_numGenerations.Value);
-                SetTotalIterationLabelText(chart.Series[0].Points.Count + " Total Iterations");
+                SetTotalIterationLabelText(chart.Series[0].Points.Count + " Total Iterations, Population Size: " + pop.Population.Count);
 
                 //Repaint the form
                 UpdateForm();
@@ -235,6 +239,21 @@ namespace NNTest
         }
 
         //For setting the Run Generations button text
+        delegate int GetSelectedBreedingIndexCallback();
+        private int GetSelectedBreedingIndex()
+        {
+            if (this.button_runGenerations.InvokeRequired)
+            {
+                GetSelectedBreedingIndexCallback c = new GetSelectedBreedingIndexCallback(GetSelectedBreedingIndex);
+                return (int)this.Invoke(c, new object[] { });
+            }
+            else
+            {
+                return comboBox_BreedingType.SelectedIndex;
+            }
+        }
+
+        //For setting the Run Generations button text
         delegate void SetRunGenerationsButtonTextCallback(string text);
         private void SetRunGenerationsButtonText(string text)
         {
@@ -287,7 +306,17 @@ namespace NNTest
                     chart.Series["Max Moving Average"].Points.AddY(Util.CalculateMovingAverage(chart.Series["Max Moving Average"].Points[chart.Series["Max Moving Average"].Points.Count - 1].YValues[0], max, (int)numericUpDown_movingAverageWindowSize.Value));
                     chart.Series["Max"].Points.AddY(max);
                 }
+
+                //chart_geneViewer.Series["genome0"].Points.Clear();
+                //chart_geneViewer.Series["genome1"].Points.Clear();
+                //chart_geneViewer.Series["genome2"].Points.Clear();
+
+                //chart_geneViewer.Series["genome0"].Points.Add(pop.Population[0].Weights);
+                //chart_geneViewer.Series["genome1"].Points.Add(pop.Population[1].Weights);
+                //chart_geneViewer.Series["genome2"].Points.Add(pop.Population[2].Weights);
+
                 chart.Update();
+                //chart_geneViewer.Update();
             }
         }
 
