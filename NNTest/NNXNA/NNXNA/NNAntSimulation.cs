@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
 using System.Threading;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace NNTest
+namespace NNXNA
 {
     //This simulation class provides a way for the NN to determine its fitness each generation.
     //It is also a form, thus satisfying the requirement for a Show and Close function.
-    public partial class NNAntSimulation : Form, NNPopulationSimulation
+    public partial class NNAntSimulation : NNPopulationSimulation
     {
         #region Constant Values
 
@@ -29,11 +27,11 @@ namespace NNTest
         private const int antSize = 10;
 
         //The display Brush of the food
-        private Brush foodBrush = Brushes.Green;
+        private Color foodBrush = Color.Green;
         //The display Brush of the ant
-        private Brush antBrush = Brushes.Blue;
+        private Color antBrush = Color.Blue;
         //The display Brush of a highlighted ant
-        private Brush highlightedAntBrush = Brushes.Red;
+        private Color highlightedAntBrush = Color.Red;
 
         //Client Width is used at initialization of this class to determine the width in the designer
         private const int clientWidth = 400;
@@ -56,25 +54,46 @@ namespace NNTest
         //Is the simulation actually shown
         private bool isShowing;
 
+        //The iteration counter for the simulation
+        private int currentIteration;
+
+        //The population for the simulation
+        private List<NN> population;
+
+        //The number of iterations the simulation is to run before completion
+        private int numberOfIterations;
+
+        //The number of indicies to highlight under a certain index (used for highlighting elites)
+        private int highlightIndiciesUnder;
+
+        //This value shows if the simulation is complete.
+        private bool isSimulationComplete;
+
+        //This array contains the score which will be output for each ant.
+        private double[] score;
+
         #endregion
 
         #region Constructors
 
         //Construct an ant simulation with a certain population
-        public NNAntSimulation(int populationSize)
+        public NNAntSimulation(List<NN> population, int numberOfIterations, int highlightIndiciesUnder)
         {
-            InitializeComponent();
+            //Set the member variables
+            this.population = population;
+            this.numberOfIterations = numberOfIterations;
+            this.highlightIndiciesUnder = highlightIndiciesUnder;
 
             //We don't show the form by default
-            isShowing = false;
+            isShowing = true;
 
             //Initialize the positions and directions of all the ants
-            ants = new SimAnt[populationSize];
+            ants = new SimAnt[population.Count];
 
             for (int i = 0; i < ants.Length; i++)
             {
                 //Create a random ant
-                ants[i] = new SimAnt(Util.randNumGen.NextDouble() * Math.PI * 2, 0, new Vector2(Util.randNumGen.Next(0, this.Width), Util.randNumGen.Next(0, this.Height)));
+                ants[i] = new SimAnt(Util.randNumGen.NextDouble() * Math.PI * 2, 0, new Vector2(Util.randNumGen.Next(0, clientWidth), Util.randNumGen.Next(0, clientHeight)));
             }
 
             //Initialize the list of food
@@ -82,7 +101,16 @@ namespace NNTest
 
             //Fill the food list with randomly generated food positions on the canvas
             for (int i = 0; i < foodCount; i++)
-                food.Add(new Vector2(Util.randNumGen.Next(0, this.Width - 1), Util.randNumGen.Next(0, this.Height - 1)));
+                food.Add(new Vector2(Util.randNumGen.Next(0, clientWidth - 1), Util.randNumGen.Next(0, clientHeight - 1)));
+
+            currentIteration = 0;
+
+            isSimulationComplete = false;
+
+            score = new double[population.Count];
+
+            for (int i = 0; i < score.Length; i++)
+                score[i] = 0f;
         }
 
         #endregion
@@ -94,8 +122,6 @@ namespace NNTest
         {
             //Show the form
             isShowing = true;
-
-            this.Show();
         }
 
         //This function is required and allows the simulation to close it's self if it, and the calling class wishes
@@ -103,54 +129,69 @@ namespace NNTest
         {
             //Close the form
             isShowing = false;
-
-            this.Close();
         }
 
-        //This is the primary overwritten function for the NNPopulationSimulation interface
-        //It will run a simulation which will show the ants finding food, or simulate without display.
-        public double[] RunPopulationSimulation(List<NN> population, int numberOfIterations, int highlightIndiciesUnder)
+        public void Draw(GameTime gameTime, GraphicsDeviceManager graphics, SpriteBatch spriteBatch)
         {
-            //Generate an array in which the score will be output for each ant
-            double[] score = new double[population.Count];
-
-            //Initialize the variables for drawing (may not be used if isShowing stays false)
-            Bitmap buffer = new Bitmap(this.Width, this.Height);
-            Graphics g = Graphics.FromImage(buffer);
-            Graphics finalG = g;
-            if(isShowing) finalG = this.CreateGraphics();
-
-            //Iterate through the number of request iterations
-            for (int i = 0; i < numberOfIterations; i++)
+            //If the graphics variables are not null
+            if (isShowing)
             {
-                //If the graphics variables are not null
-                if (isShowing)
+                
+                //Draw the simulation
+
+                spriteBatch.DrawString(Util.genericTextFont, "Iteration: " + currentIteration + " of " + numberOfIterations, new Vector2(20, 45), Color.White);
+
+                //Draw the iteration number
+                ///label.Text = "Iteration # " + i + " in progress...";
+
+                //Clear the graphics
+                ///g.Clear(System.Drawing.Color.White);
+
+                //Draw the food rectangles
+                for (int j = 0; j < food.Count; j++)
                 {
-                    //Draw the simulation
+                    VertexPositionColor[] verts = new VertexPositionColor[5];
 
-                    //Draw the iteration number
-                    label.Text = "Iteration # " + i + " in progress...";
+                    float offset = foodSize / 2;
 
-                    //Clear the graphics
-                    g.Clear(System.Drawing.Color.White);
+                    verts[0] = new VertexPositionColor(new Vector3(food[j].X - offset, food[j].Y - offset, 0), foodBrush);
+                    verts[1] = new VertexPositionColor(new Vector3(food[j].X + offset, food[j].Y - offset, 0), foodBrush);
+                    verts[2] = new VertexPositionColor(new Vector3(food[j].X + offset, food[j].Y + offset, 0), foodBrush);
+                    verts[3] = new VertexPositionColor(new Vector3(food[j].X - offset, food[j].Y + offset, 0), foodBrush);
+                    verts[4] = new VertexPositionColor(new Vector3(food[j].X - offset, food[j].Y - offset, 0), foodBrush);
 
-                    //Draw the food rectangles
-                    for (int j = 0; j < food.Count; j++)
-                        g.FillRectangle(foodBrush, food[j].X-foodSize/2, food[j].Y-foodSize/2, foodSize, foodSize);
-
-                    //Draw the ant circles
-                    for (int j = 0; j < ants.Length; j++)
-                        if(j<highlightIndiciesUnder)
-                            g.FillEllipse(highlightedAntBrush, ants[j].Position.X - antSize / 2, ants[j].Position.Y - antSize / 2, antSize, antSize);
-                        else
-                            g.FillEllipse(antBrush, ants[j].Position.X - antSize / 2, ants[j].Position.Y - antSize / 2, antSize, antSize);
-
-                    //Draw the buffer to the form
-                    finalG.DrawImage(buffer, 0, 0);
-
-                    //Update the form
-                    this.Update();
+                    graphics.GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.LineStrip, verts, 0, verts.Length - 1);
                 }
+
+                //Draw the ant circles
+                for (int j = 0; j < ants.Length; j++)
+                    if (j < highlightIndiciesUnder)
+                        graphics.GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.LineStrip, ants[j].getVertexPositionColor(highlightedAntBrush, antSize), 0, ants[j].NumVertices);
+                    else
+                        graphics.GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.LineStrip, ants[j].getVertexPositionColor(antBrush, antSize), 0, ants[j].NumVertices);
+
+                //Draw the buffer to the form
+                ///finalG.DrawImage(buffer, 0, 0);
+
+                //Find the maximum score this round
+                ///int maxIndex = -1;
+                ///double maxScore = -1;
+                ///for (int i = 0; i < score.Length; i++)
+                ///    if (score[i] > maxScore)
+                ///    {
+                ///        maxIndex = i;
+                ///        maxScore = score[i];
+                ///    }
+
+                //Display the best score for one second
+                ///label.Text = "Done! Max Score: " + maxScore;
+            }
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            if (currentIteration < numberOfIterations)
+            {
 
                 //Create a list to store the food which should be replaced at the end of the loop
                 //This is done as opposed to removing as we go so that multiple ants can, in theory, "share" a piece of food
@@ -178,7 +219,7 @@ namespace NNTest
 
                     //NOTE: THIS SECTION SHOULD BE CHANGED TO REFLECT MORE INPUTS WHICH COULD PRODUCE A MORE ROBUST NETWORK
                     //Generate the inputs for this iteration of the neural network
-                    double[] NNInput = new double[] { foodDirection.X,foodDirection.Y, ants[j].LookAt.X, ants[j].LookAt.Y};
+                    double[] NNInput = new double[] { foodDirection.X, foodDirection.Y, ants[j].LookAt.X, ants[j].LookAt.Y };
 
                     //Compute the outputs from the neural network
                     double[] NNOutput = population[j].ComputeNNOutputs(NNInput);
@@ -201,8 +242,8 @@ namespace NNTest
                     float y = ants[j].LookAt.Y * (float)ants[j].Speed + ants[j].Position.Y;
 
                     //Wrap the ant location around the map so it represents a torus
-                    x = (x + this.Width) % this.Width;
-                    y = (y + this.Height) % this.Height;
+                    x = (x + clientWidth) % clientWidth;
+                    y = (y + clientHeight) % clientHeight;
 
                     ants[j].Position = new Vector2(x, y);
                 }
@@ -213,29 +254,24 @@ namespace NNTest
                     //Remove the vector from the list
                     food.Remove(currentFood);
                     //Add a new one in its place
-                    food.Add(new Vector2(Util.randNumGen.Next(0, this.Width - 1), Util.randNumGen.Next(0, this.Height - 1)));
+                    food.Add(new Vector2(Util.randNumGen.Next(0, clientWidth - 1), Util.randNumGen.Next(0, clientHeight - 1)));
                 }
-            }
 
-            //If the simulation is showing at the end
-            if (isShowing)
+                currentIteration++;
+            }
+            else
             {
-                //Find the maximum score this round
-                int maxIndex = -1;
-                double maxScore = -1;
-                for (int i = 0; i < score.Length; i++)
-                    if (score[i] > maxScore)
-                    {
-                        maxIndex = i;
-                        maxScore = score[i];
-                    }
-
-                //Display the best score for one second
-                label.Text = "Done! Max Score: " + maxScore;
-                this.Update();
+                isSimulationComplete = true;
             }
+        }
 
-            //Return the scores from this round
+        public bool IsSimulationComplete()
+        {
+            return isSimulationComplete;
+        }
+
+        public double[] GetSimulationResults()
+        {
             return score;
         }
 

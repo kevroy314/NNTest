@@ -3,6 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NNTest", "NNTest\NNTest.csproj", "{5A9C906A-572E-47F5-99D7-3634296EA701}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NNXNA", "NNXNA\NNXNA\NNXNA.csproj", "{D4D1F1FB-3511-417C-ACDB-934F37356885}"
+EndProject
+Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "NNXNAContent", "NNXNA\NNXNAContent\NNXNAContent.contentproj", "{E23C29B1-3D9F-4E60-B3E0-62AF0FA624E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -13,6 +17,12 @@ Global
 		{5A9C906A-572E-47F5-99D7-3634296EA701}.Debug|x86.Build.0 = Debug|x86
 		{5A9C906A-572E-47F5-99D7-3634296EA701}.Release|x86.ActiveCfg = Release|x86
 		{5A9C906A-572E-47F5-99D7-3634296EA701}.Release|x86.Build.0 = Release|x86
+		{D4D1F1FB-3511-417C-ACDB-934F37356885}.Debug|x86.ActiveCfg = Debug|x86
+		{D4D1F1FB-3511-417C-ACDB-934F37356885}.Debug|x86.Build.0 = Debug|x86
+		{D4D1F1FB-3511-417C-ACDB-934F37356885}.Release|x86.ActiveCfg = Release|x86
+		{D4D1F1FB-3511-417C-ACDB-934F37356885}.Release|x86.Build.0 = Release|x86
+		{E23C29B1-3D9F-4E60-B3E0-62AF0FA624E5}.Debug|x86.ActiveCfg = Debug|x86
+		{E23C29B1-3D9F-4E60-B3E0-62AF0FA624E5}.Release|x86.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
