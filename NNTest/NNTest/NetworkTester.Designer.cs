@@ -34,10 +34,6 @@
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series7 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.richTextBox_simpleOut = new System.Windows.Forms.RichTextBox();
             this.textBox_testInput = new System.Windows.Forms.TextBox();
             this.label_testInput = new System.Windows.Forms.Label();
@@ -55,11 +51,9 @@
             this.label_movingAverageWindowSize = new System.Windows.Forms.Label();
             this.label_totalIterations = new System.Windows.Forms.Label();
             this.comboBox_BreedingType = new System.Windows.Forms.ComboBox();
-            this.chart_geneViewer = new System.Windows.Forms.DataVisualization.Charting.Chart();
             ((System.ComponentModel.ISupportInitialize)(this.chart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_numGenerations)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_movingAverageWindowSize)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart_geneViewer)).BeginInit();
             this.SuspendLayout();
             // 
             // richTextBox_simpleOut
@@ -118,9 +112,9 @@
             // 
             // button_runGenerations
             // 
-            this.button_runGenerations.Location = new System.Drawing.Point(430, 320);
+            this.button_runGenerations.Location = new System.Drawing.Point(299, 317);
             this.button_runGenerations.Name = "button_runGenerations";
-            this.button_runGenerations.Size = new System.Drawing.Size(133, 50);
+            this.button_runGenerations.Size = new System.Drawing.Size(132, 50);
             this.button_runGenerations.TabIndex = 7;
             this.button_runGenerations.Text = "Run Generations";
             this.button_runGenerations.UseVisualStyleBackColor = true;
@@ -134,7 +128,7 @@
             legend1.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
             legend1.Name = "Legend1";
             this.chart.Legends.Add(legend1);
-            this.chart.Location = new System.Drawing.Point(287, 15);
+            this.chart.Location = new System.Drawing.Point(156, 12);
             this.chart.Name = "chart";
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
@@ -160,14 +154,14 @@
             this.chart.Series.Add(series2);
             this.chart.Series.Add(series3);
             this.chart.Series.Add(series4);
-            this.chart.Size = new System.Drawing.Size(398, 256);
+            this.chart.Size = new System.Drawing.Size(397, 256);
             this.chart.TabIndex = 8;
             this.chart.Text = "chart1";
             // 
             // checkBox_showSimulation
             // 
             this.checkBox_showSimulation.AutoSize = true;
-            this.checkBox_showSimulation.Location = new System.Drawing.Point(566, 270);
+            this.checkBox_showSimulation.Location = new System.Drawing.Point(435, 267);
             this.checkBox_showSimulation.Name = "checkBox_showSimulation";
             this.checkBox_showSimulation.Size = new System.Drawing.Size(110, 17);
             this.checkBox_showSimulation.TabIndex = 9;
@@ -177,7 +171,7 @@
             // 
             // numericUpDown_numGenerations
             // 
-            this.numericUpDown_numGenerations.Location = new System.Drawing.Point(566, 311);
+            this.numericUpDown_numGenerations.Location = new System.Drawing.Point(435, 308);
             this.numericUpDown_numGenerations.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -189,7 +183,7 @@
             0,
             0});
             this.numericUpDown_numGenerations.Name = "numericUpDown_numGenerations";
-            this.numericUpDown_numGenerations.Size = new System.Drawing.Size(95, 20);
+            this.numericUpDown_numGenerations.Size = new System.Drawing.Size(94, 20);
             this.numericUpDown_numGenerations.TabIndex = 10;
             this.numericUpDown_numGenerations.Value = new decimal(new int[] {
             100,
@@ -200,7 +194,7 @@
             // label_numGenerations
             // 
             this.label_numGenerations.AutoSize = true;
-            this.label_numGenerations.Location = new System.Drawing.Point(563, 294);
+            this.label_numGenerations.Location = new System.Drawing.Point(432, 291);
             this.label_numGenerations.Name = "label_numGenerations";
             this.label_numGenerations.Size = new System.Drawing.Size(116, 13);
             this.label_numGenerations.TabIndex = 11;
@@ -209,7 +203,7 @@
             // label_iteration
             // 
             this.label_iteration.AutoSize = true;
-            this.label_iteration.Location = new System.Drawing.Point(303, 271);
+            this.label_iteration.Location = new System.Drawing.Point(172, 268);
             this.label_iteration.Name = "label_iteration";
             this.label_iteration.Size = new System.Drawing.Size(51, 13);
             this.label_iteration.TabIndex = 12;
@@ -217,9 +211,9 @@
             // 
             // button_reset
             // 
-            this.button_reset.Location = new System.Drawing.Point(306, 336);
+            this.button_reset.Location = new System.Drawing.Point(175, 333);
             this.button_reset.Name = "button_reset";
-            this.button_reset.Size = new System.Drawing.Size(76, 34);
+            this.button_reset.Size = new System.Drawing.Size(75, 34);
             this.button_reset.TabIndex = 13;
             this.button_reset.Text = "Reset";
             this.button_reset.UseVisualStyleBackColor = true;
@@ -227,7 +221,7 @@
             // 
             // numericUpDown_movingAverageWindowSize
             // 
-            this.numericUpDown_movingAverageWindowSize.Location = new System.Drawing.Point(306, 310);
+            this.numericUpDown_movingAverageWindowSize.Location = new System.Drawing.Point(175, 307);
             this.numericUpDown_movingAverageWindowSize.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -239,7 +233,7 @@
             0,
             0});
             this.numericUpDown_movingAverageWindowSize.Name = "numericUpDown_movingAverageWindowSize";
-            this.numericUpDown_movingAverageWindowSize.Size = new System.Drawing.Size(76, 20);
+            this.numericUpDown_movingAverageWindowSize.Size = new System.Drawing.Size(75, 20);
             this.numericUpDown_movingAverageWindowSize.TabIndex = 10;
             this.numericUpDown_movingAverageWindowSize.Value = new decimal(new int[] {
             10,
@@ -250,7 +244,7 @@
             // label_movingAverageWindowSize
             // 
             this.label_movingAverageWindowSize.AutoSize = true;
-            this.label_movingAverageWindowSize.Location = new System.Drawing.Point(303, 294);
+            this.label_movingAverageWindowSize.Location = new System.Drawing.Point(172, 291);
             this.label_movingAverageWindowSize.Name = "label_movingAverageWindowSize";
             this.label_movingAverageWindowSize.Size = new System.Drawing.Size(150, 13);
             this.label_movingAverageWindowSize.TabIndex = 11;
@@ -258,9 +252,9 @@
             // 
             // label_totalIterations
             // 
-            this.label_totalIterations.Location = new System.Drawing.Point(337, 9);
+            this.label_totalIterations.Location = new System.Drawing.Point(206, 6);
             this.label_totalIterations.Name = "label_totalIterations";
-            this.label_totalIterations.Size = new System.Drawing.Size(330, 13);
+            this.label_totalIterations.Size = new System.Drawing.Size(329, 13);
             this.label_totalIterations.TabIndex = 14;
             this.label_totalIterations.Text = "0 Total Iterations";
             this.label_totalIterations.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -274,51 +268,16 @@
             "Average",
             "Crossover",
             "Pick Each"});
-            this.comboBox_BreedingType.Location = new System.Drawing.Point(566, 336);
+            this.comboBox_BreedingType.Location = new System.Drawing.Point(435, 333);
             this.comboBox_BreedingType.Name = "comboBox_BreedingType";
-            this.comboBox_BreedingType.Size = new System.Drawing.Size(113, 21);
+            this.comboBox_BreedingType.Size = new System.Drawing.Size(112, 21);
             this.comboBox_BreedingType.TabIndex = 15;
-            // 
-            // chart_geneViewer
-            // 
-            this.chart_geneViewer.BorderlineColor = System.Drawing.Color.Black;
-            this.chart_geneViewer.BorderlineWidth = 0;
-            this.chart_geneViewer.BorderSkin.BorderWidth = 0;
-            chartArea2.AxisX.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.False;
-            chartArea2.AxisX2.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.False;
-            chartArea2.AxisY.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.False;
-            chartArea2.AxisY2.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.False;
-            chartArea2.Name = "ChartArea1";
-            this.chart_geneViewer.ChartAreas.Add(chartArea2);
-            this.chart_geneViewer.Location = new System.Drawing.Point(153, 12);
-            this.chart_geneViewer.Margin = new System.Windows.Forms.Padding(0);
-            this.chart_geneViewer.Name = "chart_geneViewer";
-            this.chart_geneViewer.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Berry;
-            series5.BorderWidth = 0;
-            series5.ChartArea = "ChartArea1";
-            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
-            series5.Name = "genome0";
-            series6.BorderWidth = 0;
-            series6.ChartArea = "ChartArea1";
-            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
-            series6.Name = "genome1";
-            series7.BorderWidth = 0;
-            series7.ChartArea = "ChartArea1";
-            series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
-            series7.Name = "genome2";
-            this.chart_geneViewer.Series.Add(series5);
-            this.chart_geneViewer.Series.Add(series6);
-            this.chart_geneViewer.Series.Add(series7);
-            this.chart_geneViewer.Size = new System.Drawing.Size(131, 238);
-            this.chart_geneViewer.TabIndex = 16;
-            this.chart_geneViewer.Text = "geneViewer";
             // 
             // NetworkTester
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(697, 386);
-            this.Controls.Add(this.chart_geneViewer);
+            this.ClientSize = new System.Drawing.Size(561, 386);
             this.Controls.Add(this.comboBox_BreedingType);
             this.Controls.Add(this.label_totalIterations);
             this.Controls.Add(this.button_reset);
@@ -344,7 +303,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.chart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_numGenerations)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_movingAverageWindowSize)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart_geneViewer)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -369,7 +327,6 @@
         private System.Windows.Forms.Label label_movingAverageWindowSize;
         private System.Windows.Forms.Label label_totalIterations;
         private System.Windows.Forms.ComboBox comboBox_BreedingType;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart_geneViewer;
     }
 }
 

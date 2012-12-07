@@ -18,7 +18,7 @@ namespace NNTest
         #region Constant Values
 
         //The amount of food which should be in each simulation at the beginning of each iteration
-        private const int foodCount = 40;
+        public static int foodCount = 40;
 
         //The distance at which food may be captured (in pixels) by an ant
         private const double minFoodCaptureDist = 7;
@@ -144,12 +144,6 @@ namespace NNTest
                             g.FillEllipse(highlightedAntBrush, ants[j].Position.X - antSize / 2, ants[j].Position.Y - antSize / 2, antSize, antSize);
                         else
                             g.FillEllipse(antBrush, ants[j].Position.X - antSize / 2, ants[j].Position.Y - antSize / 2, antSize, antSize);
-
-                    //Draw the buffer to the form
-                    finalG.DrawImage(buffer, 0, 0);
-
-                    //Update the form
-                    this.Update();
                 }
 
                 //Create a list to store the food which should be replaced at the end of the loop
@@ -173,8 +167,14 @@ namespace NNTest
                     }
 
                     //Normalize the distance so we have a direction vector to the nearest food
-                    Vector2 foodDirection = ants[j].Position - nearestFoodResult.Item1;
+                    Vector2 foodDirection = nearestFoodResult.Item1;
+                    foodDirection = nearestFoodResult.Item1 - ants[j].Position;
                     foodDirection.Normalize();
+                    if (isShowing)
+                    {
+                        g.DrawLine(Pens.Green, ants[j].Position.X, ants[j].Position.Y, ants[j].Position.X + foodDirection.X * 10, ants[j].Position.Y + foodDirection.Y * 10);
+                        g.DrawLine(Pens.Yellow, ants[j].Position.X, ants[j].Position.Y, ants[j].Position.X + ants[j].LookAt.X * 10, ants[j].Position.Y + ants[j].LookAt.Y * 10);
+                    }
 
                     //NOTE: THIS SECTION SHOULD BE CHANGED TO REFLECT MORE INPUTS WHICH COULD PRODUCE A MORE ROBUST NETWORK
                     //Generate the inputs for this iteration of the neural network
@@ -215,6 +215,15 @@ namespace NNTest
                     //Add a new one in its place
                     food.Add(new Vector2(Util.randNumGen.Next(0, this.Width - 1), Util.randNumGen.Next(0, this.Height - 1)));
                 }
+
+                if (isShowing)
+                {
+                    //Draw the buffer to the form
+                    finalG.DrawImage(buffer, 0, 0);
+
+                    //Update the form
+                    this.Update();
+                }
             }
 
             //If the simulation is showing at the end
@@ -232,6 +241,8 @@ namespace NNTest
 
                 //Display the best score for one second
                 label.Text = "Done! Max Score: " + maxScore;
+
+                //Update the form
                 this.Update();
             }
 

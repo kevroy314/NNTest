@@ -59,7 +59,7 @@ namespace NNTest
 
             label_totalIterations.Text = "0 Total Iterations, Population Size: " + pop.StartPopulationSize;
 
-            comboBox_BreedingType.SelectedIndex = 0;
+            comboBox_BreedingType.SelectedIndex = 1;
         }
 
         #endregion
@@ -482,7 +482,6 @@ namespace NNTest
         //runs as expected.
         private void button_runGenerations_Click(object sender, EventArgs e)
         {
-
             //Set the word wrap state to true so we can see the lists more easily
             richTextBox_simpleOut.WordWrap = true;
 

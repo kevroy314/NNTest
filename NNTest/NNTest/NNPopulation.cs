@@ -131,7 +131,7 @@ namespace NNTest
 
             //Loop through the triangular combination of the top numToBreed candidates
             for (int i = 0; i < numToBreed; i++)
-                for (int j = i; j < numToBreed; j++)
+                for (int j = i + 1; j < numToBreed; j++)
                     //Select their indicies
                     potentialBreeders.Add(new Tuple<int, int>(sortedFitnessList[i].Key, sortedFitnessList[j].Key));
 
@@ -312,8 +312,11 @@ namespace NNTest
         }
 
         //This function will mutate the population given some probability, a min and max number of mutations, and a range for the mutation (the weight, if mutated, will mutate within that range either positive or negative)
-        public void Mutate(double weightMutationProbability, int minNumberOfMutations, int maxNumberOfMutations, double weightMutationIntensityRange)
+        public int Mutate(double weightMutationProbability, int minNumberOfMutations, int maxNumberOfMutations, double weightMutationIntensityRange)
         {
+            //A counter that accumulates the actual number of times a mutation occurs
+            int mutationCount = 0;
+
             //Decide how many mutations will happen, at most
             int numberOfMutations = Util.randNumGen.Next(minNumberOfMutations, maxNumberOfMutations);
 
@@ -322,8 +325,14 @@ namespace NNTest
                 for (int j = 0; j < numberOfMutations; j++)
                     //Decide if a given mutation chance will result in an actual mutation
                     if (Util.randNumGen.NextDouble() <= weightMutationProbability)
+                    {
                         //Mutate a random weight within the mutation range (this weight could be the same weight every mutation, resulting in compounded mutations on a given weight)
-                        population[i].Weights[Util.randNumGen.Next(0, population[i].Weights.Length - 1)] += (Util.randNumGen.NextDouble() * weightMutationIntensityRange) - (Util.randNumGen.NextDouble() * weightMutationIntensityRange);
+                        int mutatedIndex = Util.randNumGen.Next(0, population[i].Weights.Length - 1);
+                        double mutatedDegree = (Util.randNumGen.NextDouble() * weightMutationIntensityRange) - (Util.randNumGen.NextDouble() * weightMutationIntensityRange);
+                        population[i].Weights[mutatedIndex] += mutatedDegree;
+                        mutationCount++;
+                    }
+            return mutationCount;
         }
 
         //Run a generation given a particular fitness simulation, this simulation must implement NNPopulationSimulation
