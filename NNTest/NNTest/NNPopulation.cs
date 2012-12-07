@@ -8,39 +8,7 @@ namespace NNTest
     //This class represents a population of neural networks which can breed, mutate, and evaluate their fitness
     class NNPopulation
     {
-        #region Constant Values
-
-        //The number of iterations the NNPopulationSimulation which calculates the fitness should run (range 1-inf)
-        private const int numFitnessSimulationIterations = 2000;
-
-        //This probability will decide how likely it is a genes will mutate if it is selected to mutate (range 0-1)
-        private const double probabilityOfWeightMutationIfChosenToMutate = 0.1;
-        //This proportion determines the minimum number of genes that could mutate as a proprtion of the total number of genes (range 0-1)
-        private const double minimumProportionOfMutationsPerPopulationMember = 0;
-        //This proportion determines the maximum number of genes that could mutate as a proportion of the total number of genes (range 0-1)
-        private const double maximumProportionOfMutationsPerPopulationMember = 1;
-        //This range determines the maximum and minimum amount each gene will mutate if chosen to mutate (range -inf-inf)
-        private const double rangeOfMutationPerturbation = 0.3;
-
-        //This weight determines the amount of genetic material the first parent will contribute (range 0-1, firstParentBreedingWeight + secondParentBreedingWeight should equal 1 to avoid unintended mutation)
-        private const double firstParentBreedingWeight = 0.5;
-        //This weight determines the amount of genetic material the second parent will contribute (range 0-1, firstParentBreedingWeight + secondParentBreedingWeight should equal 1 to avoid unintended mutation)
-        private const double secondParentBreedingWeight = 0.5;
-
-        //This is used in the crossover breeding function, it determines the rate at which breeding results in a crossover (as opposed to a clone of the parents)
-        private const double crossoverRate = 0.7;
-
-        //This proportion determines the amount of entities which will breed randomly of the top fitness entities (range 0-1)
-        private const double proportionToBreed = 0.5;
-
-        //This sets the number of entities which will survive a generation because their fitness was high enough
-        private const int numberOfElites = 4;
-        //This sets the number of copies of each elite which should be placed back in the population
-        private const int numOfCopiesOfElites = 1;
-
-        public enum BreedingFunction { Average=0, Crossover=1, PickEach=2 };
-
-        #endregion
+        public enum BreedingFunction { Average = 0, Crossover = 1, PickEach = 2 };
 
         #region Member Variables
 
@@ -91,7 +59,7 @@ namespace NNTest
                 sim.ShowSimulation();
 
             //Run the simulation on the current population for a set number of iterations
-            double[] output = sim.RunPopulationSimulation(population, numFitnessSimulationIterations, numberOfElites * numOfCopiesOfElites);
+            double[] output = sim.RunPopulationSimulation(population, Params.numFitnessSimulationIterations, Params.numberOfElites * Params.numOfCopiesOfElites);
 
             if (showSimulation)
                 //Close the simulation if it requires that
@@ -124,7 +92,7 @@ namespace NNTest
             Tuple<int, int>[] output = new Tuple<int, int>[sortedFitnessList.Length];
 
             //Get the number of top networks to breed
-            int numToBreed = (int)(proportionToBreed * population.Count);
+            int numToBreed = (int)(Params.proportionToBreed * population.Count);
 
             //Create a list of potentially breedable couples
             List<Tuple<int, int>> potentialBreeders = new List<Tuple<int, int>>();
@@ -157,8 +125,8 @@ namespace NNTest
             List<NN> newPopulation = new List<NN>();
 
             //Place the elites in the population
-            for (int i = 0; i < numberOfElites; i++)
-                for (int j = 0; j < numOfCopiesOfElites; j++)
+            for (int i = 0; i < Params.numberOfElites; i++)
+                for (int j = 0; j < Params.numOfCopiesOfElites; j++)
                     newPopulation.Add(population[sortedFitnessList[i].Key]);
 
             //Filling the remainder of the population
@@ -166,7 +134,7 @@ namespace NNTest
             while (newPopulation.Count < population.Count)
             {
                 //If we randomly are above the crossover rate
-                if (Util.randNumGen.NextDouble() > crossoverRate)
+                if (Util.randNumGen.NextDouble() > Params.crossoverRate)
                 {
                     //Add the first parent
                     newPopulation.Add(population[couples[k].Item1]);
@@ -222,8 +190,8 @@ namespace NNTest
             List<NN> newPopulation = new List<NN>();
 
             //Place the elites in the population
-            for (int i = 0; i < numberOfElites; i++)
-                for (int j = 0; j < numOfCopiesOfElites; j++)
+            for (int i = 0; i < Params.numberOfElites; i++)
+                for (int j = 0; j < Params.numOfCopiesOfElites; j++)
                     newPopulation.Add(population[sortedFitnessList[i].Key]);
 
             //Filling the remainder of the population
@@ -231,7 +199,7 @@ namespace NNTest
             while (newPopulation.Count < population.Count)
             {
                 //If we randomly are above the crossover rate
-                if (Util.randNumGen.NextDouble() > crossoverRate)
+                if (Util.randNumGen.NextDouble() > Params.crossoverRate)
                 {
                     //Add the first parent
                     newPopulation.Add(population[couples[k].Item1]);
@@ -288,8 +256,8 @@ namespace NNTest
             List<NN> newPopulation = new List<NN>();
 
             //Place the elites in the population
-            for (int i = 0; i < numberOfElites; i++)
-                for (int j = 0; j < numOfCopiesOfElites; j++)
+            for (int i = 0; i < Params.numberOfElites; i++)
+                for (int j = 0; j < Params.numOfCopiesOfElites; j++)
                     newPopulation.Add(population[sortedFitnessList[i].Key]);
 
             //Filling the remainder of the population
@@ -301,7 +269,7 @@ namespace NNTest
 
                 //For each weight in the breeding couple, average the weights of the parents to create the child weights
                 for (int j = 0; j < newPopulation[k].Weights.Length; j++)
-                    newPopulation[k].Weights[j] = (population[couples[k].Item1].Weights[j] * firstParentBreedingWeight + population[couples[k].Item2].Weights[j] * secondParentBreedingWeight);
+                    newPopulation[k].Weights[j] = (population[couples[k].Item1].Weights[j] * Params.firstParentBreedingWeight + population[couples[k].Item2].Weights[j] * Params.secondParentBreedingWeight);
 
                 //Confirm that the iteration variable does not exceed the array size from which it is pulling values
                 k = (k + 1) % couples.Length;
@@ -355,7 +323,7 @@ namespace NNTest
                 population = BreedPickEach(breedingCouples, sortedFitnessList);
 
             //Mutate the new population
-            Mutate(probabilityOfWeightMutationIfChosenToMutate, (int)(((double)population.Count) * minimumProportionOfMutationsPerPopulationMember), (int)(((double)population.Count) * maximumProportionOfMutationsPerPopulationMember), rangeOfMutationPerturbation);
+            Mutate(Params.probabilityOfWeightMutationIfChosenToMutate, (int)(((double)population.Count) * Params.minimumProportionOfMutationsPerPopulationMember), (int)(((double)population.Count) * Params.maximumProportionOfMutationsPerPopulationMember), Params.rangeOfMutationPerturbation);
         }
 
         #endregion

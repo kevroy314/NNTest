@@ -15,36 +15,6 @@ namespace NNTest
     //It is also a form, thus satisfying the requirement for a Show and Close function.
     public partial class NNAntSimulation : Form, NNPopulationSimulation
     {
-        #region Constant Values
-
-        //The amount of food which should be in each simulation at the beginning of each iteration
-        public static int foodCount = 40;
-
-        //The distance at which food may be captured (in pixels) by an ant
-        private const double minFoodCaptureDist = 7;
-
-        //The display size of the food
-        private const int foodSize = 3;
-        //The display size of the ant
-        private const int antSize = 10;
-
-        //The display Brush of the food
-        private Brush foodBrush = Brushes.Green;
-        //The display Brush of the ant
-        private Brush antBrush = Brushes.Blue;
-        //The display Brush of a highlighted ant
-        private Brush highlightedAntBrush = Brushes.Red;
-
-        //Client Width is used at initialization of this class to determine the width in the designer
-        private const int clientWidth = 400;
-        //Client Height is used at initialization of this class to determine the height in the designer
-        private const int clientHeight = 400;
-
-        //Maximum amount of rotation the ant can have in any iteration
-        private const double maxRotationRate = 0.3;
-
-        #endregion
-
         #region Member Variables
 
         //The array of ants containing their associated meta-data
@@ -74,15 +44,15 @@ namespace NNTest
             for (int i = 0; i < ants.Length; i++)
             {
                 //Create a random ant
-                ants[i] = new SimAnt(Util.randNumGen.NextDouble() * Math.PI * 2, 0, new Vector2(Util.randNumGen.Next(0, this.Width), Util.randNumGen.Next(0, this.Height)));
+                ants[i] = new SimAnt(Util.randNumGen.NextDouble() * Math.PI * 2, 0, new Vector2(Util.randNumGen.Next(0, Params.clientWidth), Util.randNumGen.Next(0, Params.clientHeight)));
             }
 
             //Initialize the list of food
             food = new List<Vector2>();
 
             //Fill the food list with randomly generated food positions on the canvas
-            for (int i = 0; i < foodCount; i++)
-                food.Add(new Vector2(Util.randNumGen.Next(0, this.Width - 1), Util.randNumGen.Next(0, this.Height - 1)));
+            for (int i = 0; i < Params.foodCount; i++)
+                food.Add(new Vector2(Util.randNumGen.Next(0, Params.clientWidth - 1), Util.randNumGen.Next(0, Params.clientHeight - 1)));
         }
 
         #endregion
@@ -115,7 +85,7 @@ namespace NNTest
             double[] score = new double[population.Count];
 
             //Initialize the variables for drawing (may not be used if isShowing stays false)
-            Bitmap buffer = new Bitmap(this.Width, this.Height);
+            Bitmap buffer = new Bitmap(Params.clientWidth, Params.clientHeight);
             Graphics g = Graphics.FromImage(buffer);
             Graphics finalG = g;
             if(isShowing) finalG = this.CreateGraphics();
@@ -136,14 +106,14 @@ namespace NNTest
 
                     //Draw the food rectangles
                     for (int j = 0; j < food.Count; j++)
-                        g.FillRectangle(foodBrush, food[j].X-foodSize/2, food[j].Y-foodSize/2, foodSize, foodSize);
+                        g.FillRectangle(Params.foodBrush, food[j].X - Params.foodSize / 2, food[j].Y - Params.foodSize / 2, Params.foodSize, Params.foodSize);
 
                     //Draw the ant circles
                     for (int j = 0; j < ants.Length; j++)
                         if(j<highlightIndiciesUnder)
-                            g.FillEllipse(highlightedAntBrush, ants[j].Position.X - antSize / 2, ants[j].Position.Y - antSize / 2, antSize, antSize);
+                            g.FillEllipse(Params.highlightedAntBrush, ants[j].Position.X - Params.antSize / 2, ants[j].Position.Y - Params.antSize / 2, Params.antSize, Params.antSize);
                         else
-                            g.FillEllipse(antBrush, ants[j].Position.X - antSize / 2, ants[j].Position.Y - antSize / 2, antSize, antSize);
+                            g.FillEllipse(Params.antBrush, ants[j].Position.X - Params.antSize / 2, ants[j].Position.Y - Params.antSize / 2, Params.antSize, Params.antSize);
                 }
 
                 //Create a list to store the food which should be replaced at the end of the loop
@@ -158,7 +128,7 @@ namespace NNTest
                     Tuple<Vector2, double> nearestFoodResult = findNearestFoodLocationAndDistance(ants[j].Position);
 
                     //If the ant is near enough the food to capture it
-                    if (nearestFoodResult.Item2 < minFoodCaptureDist)
+                    if (nearestFoodResult.Item2 < Params.minFoodCaptureDist)
                     {
                         //Add the food to the list of food which needs to be replaced at the end of the round
                         foodToRemove.Add(nearestFoodResult.Item1);
@@ -185,10 +155,10 @@ namespace NNTest
 
                     double rotationForce = NNOutput[0] - NNOutput[1];
 
-                    if (rotationForce < -maxRotationRate)
-                        rotationForce = -maxRotationRate;
-                    else if (rotationForce > maxRotationRate)
-                        rotationForce = maxRotationRate;
+                    if (rotationForce < -Params.maxRotationRate)
+                        rotationForce = -Params.maxRotationRate;
+                    else if (rotationForce > Params.maxRotationRate)
+                        rotationForce = Params.maxRotationRate;
 
                     ants[j].Orientation += rotationForce;
 
@@ -201,8 +171,8 @@ namespace NNTest
                     float y = ants[j].LookAt.Y * (float)ants[j].Speed + ants[j].Position.Y;
 
                     //Wrap the ant location around the map so it represents a torus
-                    x = (x + this.Width) % this.Width;
-                    y = (y + this.Height) % this.Height;
+                    x = (x + Params.clientWidth) % Params.clientWidth;
+                    y = (y + Params.clientHeight) % Params.clientHeight;
 
                     ants[j].Position = new Vector2(x, y);
                 }
@@ -212,9 +182,11 @@ namespace NNTest
                 {
                     //Remove the vector from the list
                     food.Remove(currentFood);
-                    //Add a new one in its place
-                    food.Add(new Vector2(Util.randNumGen.Next(0, this.Width - 1), Util.randNumGen.Next(0, this.Height - 1)));
                 }
+
+                for(int j = 0; j < Params.foodCount - food.Count;j++)
+                    //Add a new food for every missing food
+                    food.Add(new Vector2(Util.randNumGen.Next(0, Params.clientWidth - 1), Util.randNumGen.Next(0, Params.clientHeight - 1)));
 
                 if (isShowing)
                 {
@@ -266,8 +238,20 @@ namespace NNTest
             foreach(Vector2 foodItem in food)
             {
                 //Calculate the distance
-                double d = Vector2.Distance(input, foodItem);
-                
+
+                /*
+                double dx = Math.Abs(input.X - foodItem.X);
+                double dy = Math.Abs(input.Y - foodItem.Y);
+                if (dx > Params.clientWidth / 2)
+                    dx = (Params.clientWidth / 2) - dx;
+                if (dy > Params.clientHeight / 2)
+                    dy = (Params.clientHeight / 2) - dy;
+
+                double d = (dx * dx) + (dy * dy);
+                */
+
+                 //double d = Vector2.Distance(input, foodItem);
+                double d = Math.Sqrt((input.X - foodItem.X) * (input.X - foodItem.X) + (input.Y - foodItem.Y) * (input.Y - foodItem.Y));
                 //If this is a new biggest
                 if (d < minDist)
                 {
@@ -276,6 +260,8 @@ namespace NNTest
                     minFoodItem = foodItem;
                 }
             }
+
+            //minDist = Vector2.Distance(input, minFoodItem);
 
             //Return the results
             return new Tuple<Vector2, double>(minFoodItem, minDist);

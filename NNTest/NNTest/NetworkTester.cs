@@ -12,16 +12,6 @@ namespace NNTest
 {
     public partial class NetworkTester : Form
     {
-        #region Constant Values
-
-        //The number of entities to be used in the population simulation
-        private const int simulationPopulationSize = 30;
-
-        //The structure of their brains
-        private int[] neuralNetworkStructure = { 4, 6, 2 };
-
-        #endregion
-
         #region Member Variables
 
         //An internal neural network which is created purely for testing without an application
@@ -49,7 +39,7 @@ namespace NNTest
             testNN = new NN(4, 2, 1, new int[] { 6 });
 
             //Build a test population
-            pop = new NNPopulation(simulationPopulationSize, neuralNetworkStructure);
+            pop = new NNPopulation(Params.simulationPopulationSize, Params.neuralNetworkStructure);
 
             //Output the default object test results
             richTextBox_simpleOut.Text = getTestDataString();
@@ -159,6 +149,8 @@ namespace NNTest
             //Iterate the simulation
             for (int j = 0; j < numericUpDown_numGenerations.Value; j++)
             {
+                numIterations++;
+
                 //Run a single generation in the neural network ant simulation
                 pop.RunGeneration(typeof(NNAntSimulation), checkBox_showSimulation.Checked, (NNPopulation.BreedingFunction)GetSelectedBreedingIndex());
 
@@ -207,8 +199,6 @@ namespace NNTest
                     //Break out of the loop
                     break;
                 }
-
-                numIterations++;
             }
 
             //Reenable the form and set the button text
@@ -489,6 +479,8 @@ namespace NNTest
         //runs as expected.
         private void button_runGenerations_Click(object sender, EventArgs e)
         {
+            Params.foodCount = (int)numericUpDown_foodCount.Value;
+
             //Set the word wrap state to true so we can see the lists more easily
             richTextBox_simpleOut.WordWrap = true;
 
@@ -510,7 +502,7 @@ namespace NNTest
             label_iteration.Text = "Iteration: ";
 
             //Build a test population
-            pop = new NNPopulation(simulationPopulationSize, neuralNetworkStructure);
+            pop = new NNPopulation(Params.simulationPopulationSize, Params.neuralNetworkStructure);
         }
 
         //This function activates when the Show Simulation? check box is checked or unchecked. 

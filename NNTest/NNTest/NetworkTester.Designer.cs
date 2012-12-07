@@ -28,12 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series9 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series10 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series11 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series12 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series7 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series8 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.richTextBox_simpleOut = new System.Windows.Forms.RichTextBox();
             this.textBox_testInput = new System.Windows.Forms.TextBox();
             this.label_testInput = new System.Windows.Forms.Label();
@@ -52,9 +52,12 @@
             this.label_totalIterations = new System.Windows.Forms.Label();
             this.comboBox_BreedingType = new System.Windows.Forms.ComboBox();
             this.checkBox_updateChart = new System.Windows.Forms.CheckBox();
+            this.numericUpDown_foodCount = new System.Windows.Forms.NumericUpDown();
+            this.label_foodCount = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.chart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_numGenerations)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_movingAverageWindowSize)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_foodCount)).BeginInit();
             this.SuspendLayout();
             // 
             // richTextBox_simpleOut
@@ -113,7 +116,7 @@
             // 
             // button_runGenerations
             // 
-            this.button_runGenerations.Location = new System.Drawing.Point(299, 317);
+            this.button_runGenerations.Location = new System.Drawing.Point(240, 329);
             this.button_runGenerations.Name = "button_runGenerations";
             this.button_runGenerations.Size = new System.Drawing.Size(132, 50);
             this.button_runGenerations.TabIndex = 7;
@@ -124,37 +127,37 @@
             // chart
             // 
             this.chart.BackColor = System.Drawing.Color.Transparent;
-            chartArea3.Name = "ChartArea1";
-            this.chart.ChartAreas.Add(chartArea3);
-            legend3.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            legend3.Name = "Legend1";
-            this.chart.Legends.Add(legend3);
+            chartArea2.Name = "ChartArea1";
+            this.chart.ChartAreas.Add(chartArea2);
+            legend2.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            legend2.Name = "Legend1";
+            this.chart.Legends.Add(legend2);
             this.chart.Location = new System.Drawing.Point(156, 12);
             this.chart.Name = "chart";
-            series9.ChartArea = "ChartArea1";
-            series9.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series9.Color = System.Drawing.Color.Red;
-            series9.Legend = "Legend1";
-            series9.Name = "Average";
-            series10.ChartArea = "ChartArea1";
-            series10.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series10.Color = System.Drawing.Color.Green;
-            series10.Legend = "Legend1";
-            series10.Name = "Average Moving Average";
-            series11.ChartArea = "ChartArea1";
-            series11.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series11.Color = System.Drawing.Color.Orange;
-            series11.Legend = "Legend1";
-            series11.Name = "Max";
-            series12.ChartArea = "ChartArea1";
-            series12.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series12.Color = System.Drawing.Color.Blue;
-            series12.Legend = "Legend1";
-            series12.Name = "Max Moving Average";
-            this.chart.Series.Add(series9);
-            this.chart.Series.Add(series10);
-            this.chart.Series.Add(series11);
-            this.chart.Series.Add(series12);
+            series5.ChartArea = "ChartArea1";
+            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series5.Color = System.Drawing.Color.Red;
+            series5.Legend = "Legend1";
+            series5.Name = "Average";
+            series6.ChartArea = "ChartArea1";
+            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series6.Color = System.Drawing.Color.Green;
+            series6.Legend = "Legend1";
+            series6.Name = "Average Moving Average";
+            series7.ChartArea = "ChartArea1";
+            series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series7.Color = System.Drawing.Color.Orange;
+            series7.Legend = "Legend1";
+            series7.Name = "Max";
+            series8.ChartArea = "ChartArea1";
+            series8.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series8.Color = System.Drawing.Color.Blue;
+            series8.Legend = "Legend1";
+            series8.Name = "Max Moving Average";
+            this.chart.Series.Add(series5);
+            this.chart.Series.Add(series6);
+            this.chart.Series.Add(series7);
+            this.chart.Series.Add(series8);
             this.chart.Size = new System.Drawing.Size(397, 256);
             this.chart.TabIndex = 8;
             this.chart.Text = "chart1";
@@ -162,7 +165,7 @@
             // checkBox_showSimulation
             // 
             this.checkBox_showSimulation.AutoSize = true;
-            this.checkBox_showSimulation.Location = new System.Drawing.Point(435, 267);
+            this.checkBox_showSimulation.Location = new System.Drawing.Point(160, 284);
             this.checkBox_showSimulation.Name = "checkBox_showSimulation";
             this.checkBox_showSimulation.Size = new System.Drawing.Size(110, 17);
             this.checkBox_showSimulation.TabIndex = 9;
@@ -172,7 +175,7 @@
             // 
             // numericUpDown_numGenerations
             // 
-            this.numericUpDown_numGenerations.Location = new System.Drawing.Point(435, 308);
+            this.numericUpDown_numGenerations.Location = new System.Drawing.Point(455, 322);
             this.numericUpDown_numGenerations.Maximum = new decimal(new int[] {
             1000000000,
             0,
@@ -186,6 +189,7 @@
             this.numericUpDown_numGenerations.Name = "numericUpDown_numGenerations";
             this.numericUpDown_numGenerations.Size = new System.Drawing.Size(94, 20);
             this.numericUpDown_numGenerations.TabIndex = 10;
+            this.numericUpDown_numGenerations.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numericUpDown_numGenerations.Value = new decimal(new int[] {
             100,
             0,
@@ -195,7 +199,7 @@
             // label_numGenerations
             // 
             this.label_numGenerations.AutoSize = true;
-            this.label_numGenerations.Location = new System.Drawing.Point(432, 291);
+            this.label_numGenerations.Location = new System.Drawing.Point(433, 306);
             this.label_numGenerations.Name = "label_numGenerations";
             this.label_numGenerations.Size = new System.Drawing.Size(116, 13);
             this.label_numGenerations.TabIndex = 11;
@@ -204,7 +208,7 @@
             // label_iteration
             // 
             this.label_iteration.AutoSize = true;
-            this.label_iteration.Location = new System.Drawing.Point(172, 268);
+            this.label_iteration.Location = new System.Drawing.Point(156, 267);
             this.label_iteration.Name = "label_iteration";
             this.label_iteration.Size = new System.Drawing.Size(51, 13);
             this.label_iteration.TabIndex = 12;
@@ -212,7 +216,7 @@
             // 
             // button_reset
             // 
-            this.button_reset.Location = new System.Drawing.Point(175, 333);
+            this.button_reset.Location = new System.Drawing.Point(159, 345);
             this.button_reset.Name = "button_reset";
             this.button_reset.Size = new System.Drawing.Size(75, 34);
             this.button_reset.TabIndex = 13;
@@ -222,7 +226,7 @@
             // 
             // numericUpDown_movingAverageWindowSize
             // 
-            this.numericUpDown_movingAverageWindowSize.Location = new System.Drawing.Point(175, 307);
+            this.numericUpDown_movingAverageWindowSize.Location = new System.Drawing.Point(474, 283);
             this.numericUpDown_movingAverageWindowSize.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -236,6 +240,7 @@
             this.numericUpDown_movingAverageWindowSize.Name = "numericUpDown_movingAverageWindowSize";
             this.numericUpDown_movingAverageWindowSize.Size = new System.Drawing.Size(75, 20);
             this.numericUpDown_movingAverageWindowSize.TabIndex = 10;
+            this.numericUpDown_movingAverageWindowSize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numericUpDown_movingAverageWindowSize.Value = new decimal(new int[] {
             10,
             0,
@@ -245,7 +250,7 @@
             // label_movingAverageWindowSize
             // 
             this.label_movingAverageWindowSize.AutoSize = true;
-            this.label_movingAverageWindowSize.Location = new System.Drawing.Point(172, 291);
+            this.label_movingAverageWindowSize.Location = new System.Drawing.Point(403, 267);
             this.label_movingAverageWindowSize.Name = "label_movingAverageWindowSize";
             this.label_movingAverageWindowSize.Size = new System.Drawing.Size(150, 13);
             this.label_movingAverageWindowSize.TabIndex = 11;
@@ -269,7 +274,7 @@
             "Average",
             "Crossover",
             "Pick Each"});
-            this.comboBox_BreedingType.Location = new System.Drawing.Point(435, 333);
+            this.comboBox_BreedingType.Location = new System.Drawing.Point(158, 300);
             this.comboBox_BreedingType.Name = "comboBox_BreedingType";
             this.comboBox_BreedingType.Size = new System.Drawing.Size(112, 21);
             this.comboBox_BreedingType.TabIndex = 15;
@@ -286,6 +291,38 @@
             this.checkBox_updateChart.Text = "Update Chart?";
             this.checkBox_updateChart.UseVisualStyleBackColor = true;
             // 
+            // numericUpDown_foodCount
+            // 
+            this.numericUpDown_foodCount.Location = new System.Drawing.Point(455, 359);
+            this.numericUpDown_foodCount.Maximum = new decimal(new int[] {
+            1000000000,
+            0,
+            0,
+            0});
+            this.numericUpDown_foodCount.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown_foodCount.Name = "numericUpDown_foodCount";
+            this.numericUpDown_foodCount.Size = new System.Drawing.Size(94, 20);
+            this.numericUpDown_foodCount.TabIndex = 10;
+            this.numericUpDown_foodCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.numericUpDown_foodCount.Value = new decimal(new int[] {
+            40,
+            0,
+            0,
+            0});
+            // 
+            // label_foodCount
+            // 
+            this.label_foodCount.AutoSize = true;
+            this.label_foodCount.Location = new System.Drawing.Point(487, 343);
+            this.label_foodCount.Name = "label_foodCount";
+            this.label_foodCount.Size = new System.Drawing.Size(62, 13);
+            this.label_foodCount.TabIndex = 11;
+            this.label_foodCount.Text = "Food Count";
+            // 
             // NetworkTester
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -297,7 +334,9 @@
             this.Controls.Add(this.button_reset);
             this.Controls.Add(this.label_iteration);
             this.Controls.Add(this.label_movingAverageWindowSize);
+            this.Controls.Add(this.label_foodCount);
             this.Controls.Add(this.label_numGenerations);
+            this.Controls.Add(this.numericUpDown_foodCount);
             this.Controls.Add(this.numericUpDown_movingAverageWindowSize);
             this.Controls.Add(this.numericUpDown_numGenerations);
             this.Controls.Add(this.checkBox_showSimulation);
@@ -317,6 +356,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.chart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_numGenerations)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_movingAverageWindowSize)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_foodCount)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -342,6 +382,8 @@
         private System.Windows.Forms.Label label_totalIterations;
         private System.Windows.Forms.ComboBox comboBox_BreedingType;
         private System.Windows.Forms.CheckBox checkBox_updateChart;
+        private System.Windows.Forms.NumericUpDown numericUpDown_foodCount;
+        private System.Windows.Forms.Label label_foodCount;
     }
 }
 
