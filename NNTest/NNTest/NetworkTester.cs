@@ -35,6 +35,8 @@ namespace NNTest
         //This bool will be used to request the simThread be stopped
         private bool requestStop;
 
+        private int numIterations;
+
         #endregion
 
         #region Constructors
@@ -60,6 +62,8 @@ namespace NNTest
             label_totalIterations.Text = "0 Total Iterations, Population Size: " + pop.StartPopulationSize;
 
             comboBox_BreedingType.SelectedIndex = 1;
+
+            numIterations = 0;
         }
 
         #endregion
@@ -171,11 +175,12 @@ namespace NNTest
                 }
 
                 //Update the chart
-                AddChartElements(sum / latestFitness.Length, maxFitness);
+                if(checkBox_updateChart.Checked)
+                    AddChartElements(sum / latestFitness.Length, maxFitness);
 
                 //Update the iteration counters
                 SetIterationLabelText("Iteration: " + (j + 1) + "/" + numericUpDown_numGenerations.Value);
-                SetTotalIterationLabelText(chart.Series[0].Points.Count + " Total Iterations, Population Size: " + pop.Population.Count);
+                SetTotalIterationLabelText(numIterations + " Total Iterations, Population Size: " + pop.Population.Count);
 
                 //Repaint the form
                 UpdateForm();
@@ -202,6 +207,8 @@ namespace NNTest
                     //Break out of the loop
                     break;
                 }
+
+                numIterations++;
             }
 
             //Reenable the form and set the button text
@@ -493,6 +500,8 @@ namespace NNTest
         //This function is a callback for the reset button for the simulation
         private void button_reset_Click(object sender, EventArgs e)
         {
+            numIterations = 0;
+
             //Clear the chart
             for (int i = 0; i < chart.Series.Count; i++)
                 chart.Series[i].Points.Clear();

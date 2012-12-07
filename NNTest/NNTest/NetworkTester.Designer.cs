@@ -28,12 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series9 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series10 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series11 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series12 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.richTextBox_simpleOut = new System.Windows.Forms.RichTextBox();
             this.textBox_testInput = new System.Windows.Forms.TextBox();
             this.label_testInput = new System.Windows.Forms.Label();
@@ -51,6 +51,7 @@
             this.label_movingAverageWindowSize = new System.Windows.Forms.Label();
             this.label_totalIterations = new System.Windows.Forms.Label();
             this.comboBox_BreedingType = new System.Windows.Forms.ComboBox();
+            this.checkBox_updateChart = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.chart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_numGenerations)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_movingAverageWindowSize)).BeginInit();
@@ -123,37 +124,37 @@
             // chart
             // 
             this.chart.BackColor = System.Drawing.Color.Transparent;
-            chartArea1.Name = "ChartArea1";
-            this.chart.ChartAreas.Add(chartArea1);
-            legend1.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            legend1.Name = "Legend1";
-            this.chart.Legends.Add(legend1);
+            chartArea3.Name = "ChartArea1";
+            this.chart.ChartAreas.Add(chartArea3);
+            legend3.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            legend3.Name = "Legend1";
+            this.chart.Legends.Add(legend3);
             this.chart.Location = new System.Drawing.Point(156, 12);
             this.chart.Name = "chart";
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series1.Color = System.Drawing.Color.Red;
-            series1.Legend = "Legend1";
-            series1.Name = "Average";
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series2.Color = System.Drawing.Color.Green;
-            series2.Legend = "Legend1";
-            series2.Name = "Average Moving Average";
-            series3.ChartArea = "ChartArea1";
-            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series3.Color = System.Drawing.Color.Orange;
-            series3.Legend = "Legend1";
-            series3.Name = "Max";
-            series4.ChartArea = "ChartArea1";
-            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series4.Color = System.Drawing.Color.Blue;
-            series4.Legend = "Legend1";
-            series4.Name = "Max Moving Average";
-            this.chart.Series.Add(series1);
-            this.chart.Series.Add(series2);
-            this.chart.Series.Add(series3);
-            this.chart.Series.Add(series4);
+            series9.ChartArea = "ChartArea1";
+            series9.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series9.Color = System.Drawing.Color.Red;
+            series9.Legend = "Legend1";
+            series9.Name = "Average";
+            series10.ChartArea = "ChartArea1";
+            series10.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series10.Color = System.Drawing.Color.Green;
+            series10.Legend = "Legend1";
+            series10.Name = "Average Moving Average";
+            series11.ChartArea = "ChartArea1";
+            series11.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series11.Color = System.Drawing.Color.Orange;
+            series11.Legend = "Legend1";
+            series11.Name = "Max";
+            series12.ChartArea = "ChartArea1";
+            series12.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series12.Color = System.Drawing.Color.Blue;
+            series12.Legend = "Legend1";
+            series12.Name = "Max Moving Average";
+            this.chart.Series.Add(series9);
+            this.chart.Series.Add(series10);
+            this.chart.Series.Add(series11);
+            this.chart.Series.Add(series12);
             this.chart.Size = new System.Drawing.Size(397, 256);
             this.chart.TabIndex = 8;
             this.chart.Text = "chart1";
@@ -173,7 +174,7 @@
             // 
             this.numericUpDown_numGenerations.Location = new System.Drawing.Point(435, 308);
             this.numericUpDown_numGenerations.Maximum = new decimal(new int[] {
-            10000,
+            1000000000,
             0,
             0,
             0});
@@ -273,11 +274,24 @@
             this.comboBox_BreedingType.Size = new System.Drawing.Size(112, 21);
             this.comboBox_BreedingType.TabIndex = 15;
             // 
+            // checkBox_updateChart
+            // 
+            this.checkBox_updateChart.AutoSize = true;
+            this.checkBox_updateChart.Checked = true;
+            this.checkBox_updateChart.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox_updateChart.Location = new System.Drawing.Point(175, 2);
+            this.checkBox_updateChart.Name = "checkBox_updateChart";
+            this.checkBox_updateChart.Size = new System.Drawing.Size(95, 17);
+            this.checkBox_updateChart.TabIndex = 16;
+            this.checkBox_updateChart.Text = "Update Chart?";
+            this.checkBox_updateChart.UseVisualStyleBackColor = true;
+            // 
             // NetworkTester
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(561, 386);
+            this.Controls.Add(this.checkBox_updateChart);
             this.Controls.Add(this.comboBox_BreedingType);
             this.Controls.Add(this.label_totalIterations);
             this.Controls.Add(this.button_reset);
@@ -327,6 +341,7 @@
         private System.Windows.Forms.Label label_movingAverageWindowSize;
         private System.Windows.Forms.Label label_totalIterations;
         private System.Windows.Forms.ComboBox comboBox_BreedingType;
+        private System.Windows.Forms.CheckBox checkBox_updateChart;
     }
 }
 
