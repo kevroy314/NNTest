@@ -154,11 +154,23 @@ namespace NNTest
                         //Increment the ant score
                         score[j]++;
                     }
+                    
+                    //Calculate the wrapping change in x and y
+                    float dx = Math.Abs(ants[j].Position.X - nearestFoodResult.Item1.X);
+                    float dy = Math.Abs(ants[j].Position.Y - nearestFoodResult.Item1.Y);
+                    if (dx > Params.clientWidth / 2)
+                        dx = (Params.clientWidth / 2) - dx;
+                    if (dy > Params.clientHeight / 2)
+                        dy = (Params.clientHeight / 2) - dy;
+                    //This is our direction
+                    Vector2 foodDirection = new Vector2(dx, dy);
+                    //Normalize the direction to represent the unit vector of the direction
+                    foodDirection.Normalize();
 
                     //Normalize the distance so we have a direction vector to the nearest food
-                    Vector2 foodDirection = nearestFoodResult.Item1;
-                    foodDirection = nearestFoodResult.Item1 - ants[j].Position;
-                    foodDirection.Normalize();
+                    //Vector2 foodDirection = nearestFoodResult.Item1;
+                    //foodDirection = nearestFoodResult.Item1 - ants[j].Position;
+                    //foodDirection.Normalize();
 
                     if (isShowing)
                     {
@@ -265,11 +277,7 @@ namespace NNTest
             //For each food
             foreach(Vector2 foodItem in food)
             {
-                //Calculate the distance
-
-                /* TODO: OPTIMIZE AND INCLUDE WRAPPING DISTANCES
-                 * YOU WILL NEED TO MODIFY THE CALCULATION OF THE 
-                 * LOOK AT IN THE UPDATE FUNCTION TO MATCH
+                //Calculate the distance in a wrapped space
                 double dx = Math.Abs(input.X - foodItem.X);
                 double dy = Math.Abs(input.Y - foodItem.Y);
                 if (dx > Params.clientWidth / 2)
@@ -277,13 +285,14 @@ namespace NNTest
                 if (dy > Params.clientHeight / 2)
                     dy = (Params.clientHeight / 2) - dy;
 
+                //We don't need to square root it because we're just looking at the relative distance
                 double d = (dx * dx) + (dy * dy);
-                */
+                
 
-                /* Calculate the distance, alternative would be:
-                 * double d = Vector2.Distance(input, foodItem); */
-                double d = Math.Sqrt((input.X - foodItem.X) * (input.X - foodItem.X) + 
-                                     (input.Y - foodItem.Y) * (input.Y - foodItem.Y));
+                //Calculate the distance
+                //double d = Vector2.Distance(input, foodItem);
+                //double d = Math.Sqrt((input.X - foodItem.X) * (input.X - foodItem.X) + 
+                                     //(input.Y - foodItem.Y) * (input.Y - foodItem.Y));
 
                 //If this is a new biggest
                 if (d < minDist)
@@ -293,6 +302,10 @@ namespace NNTest
                     minFoodItem = foodItem;
                 }
             }
+
+            //Confirm the minimum distance is the euclidean distance
+            minDist = Math.Sqrt((input.X - minFoodItem.X) * (input.X - minFoodItem.X) +
+                                (input.Y - minFoodItem.Y) * (input.Y - minFoodItem.Y));
 
             //Return the results
             return new Tuple<Vector2, double>(minFoodItem, minDist);
