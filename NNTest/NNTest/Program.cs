@@ -15,7 +15,7 @@ namespace NNTest
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new NetworkTester());
+            Application.Run(new MainForm());
         }
     }
 }

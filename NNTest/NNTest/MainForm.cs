@@ -10,7 +10,10 @@ using System.Threading;
 
 namespace NNTest
 {
-    public partial class NetworkTester : Form
+    /* This is the main testing form used for experimenting and displaying results.
+     */ 
+
+    public partial class MainForm : Form
     {
         #region Member Variables
 
@@ -31,7 +34,7 @@ namespace NNTest
 
         #region Constructors
 
-        public NetworkTester()
+        public MainForm()
         {
             InitializeComponent();
 
@@ -152,7 +155,9 @@ namespace NNTest
                 numIterations++;
 
                 //Run a single generation in the neural network ant simulation
-                pop.RunGeneration(typeof(NNAntSimulation), checkBox_showSimulation.Checked, (NNPopulation.BreedingFunction)GetSelectedBreedingIndex());
+                pop.RunGeneration(typeof(NNAntSimulation), 
+                                  checkBox_showSimulation.Checked, 
+                                  (NNPopulation.BreedingFunction)GetSelectedBreedingIndex());
 
                 //Get the latest fitness array from the simulation
                 double[] latestFitness = pop.LatestFitness;
@@ -289,9 +294,13 @@ namespace NNTest
                 else if (chart.Series[0].Points.Count < (int)numericUpDown_movingAverageWindowSize.Value)
                 {
                     //Average with the number of points as the window size and set the points
-                    chart.Series["Average Moving Average"].Points.AddY(Util.CalculateMovingAverage(chart.Series["Average Moving Average"].Points[chart.Series["Average Moving Average"].Points.Count - 1].YValues[0], average, chart.Series[0].Points.Count + 1));
+                    chart.Series["Average Moving Average"].Points.AddY(Util.CalculateMovingAverage(chart.Series["Average Moving Average"].Points[chart.Series["Average Moving Average"].Points.Count - 1].YValues[0], 
+                                                                       average, 
+                                                                       chart.Series[0].Points.Count + 1));
                     chart.Series["Average"].Points.AddY(average);
-                    chart.Series["Max Moving Average"].Points.AddY(Util.CalculateMovingAverage(chart.Series["Max Moving Average"].Points[chart.Series["Max Moving Average"].Points.Count - 1].YValues[0], max, chart.Series[0].Points.Count + 1));
+                    chart.Series["Max Moving Average"].Points.AddY(Util.CalculateMovingAverage(chart.Series["Max Moving Average"].Points[chart.Series["Max Moving Average"].Points.Count - 1].YValues[0], 
+                                                                   max, 
+                                                                   chart.Series[0].Points.Count + 1));
                     chart.Series["Max"].Points.AddY(max);
                 }
                 //If there are more points than the window size
@@ -304,16 +313,8 @@ namespace NNTest
                     chart.Series["Max"].Points.AddY(max);
                 }
 
-                //chart_geneViewer.Series["genome0"].Points.Clear();
-                //chart_geneViewer.Series["genome1"].Points.Clear();
-                //chart_geneViewer.Series["genome2"].Points.Clear();
-
-                //chart_geneViewer.Series["genome0"].Points.Add(pop.Population[0].Weights);
-                //chart_geneViewer.Series["genome1"].Points.Add(pop.Population[1].Weights);
-                //chart_geneViewer.Series["genome2"].Points.Add(pop.Population[2].Weights);
-
+                //Update the chart
                 chart.Update();
-                //chart_geneViewer.Update();
             }
         }
 
@@ -423,7 +424,11 @@ namespace NNTest
             //If the user hasn't put in the correct number of inputs, show an error and exit the function
             if(tokens.Length!=testNN.NumberOfInputs)
             {
-                MessageBox.Show("Error: Incorrect Number of Inputs. Found "+tokens.Length+", expected "+testNN.NumberOfInputs+". Are you separating inputs with spaces?");
+                MessageBox.Show("Error: Incorrect Number of Inputs. Found " + 
+                                tokens.Length + 
+                                ", expected " + 
+                                testNN.NumberOfInputs + 
+                                ". Are you separating inputs with spaces?");
                 return;
             }
 
@@ -440,7 +445,9 @@ namespace NNTest
                 catch (FormatException)
                 {
                     //If the parse fails, show an error and exit the function
-                    MessageBox.Show("Incorrect token found at item " + i + " (0 is the first item). Confirm that the number is a properly formatted double precision floating point value.");
+                    MessageBox.Show("Incorrect token found at item " + 
+                                    i + 
+                                    " (0 is the first item). Confirm that the number is a properly formatted double precision floating point value.");
                     return;
                 }
             }

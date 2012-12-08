@@ -1,6 +1,6 @@
 ﻿namespace NNTest
 {
-    partial class NetworkTester
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -323,7 +323,7 @@
             this.label_foodCount.TabIndex = 11;
             this.label_foodCount.Text = "Food Count";
             // 
-            // NetworkTester
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -351,7 +351,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "NetworkTester";
+            this.Name = "MainForm";
             this.Text = "NNTest";
             ((System.ComponentModel.ISupportInitialize)(this.chart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_numGenerations)).EndInit();

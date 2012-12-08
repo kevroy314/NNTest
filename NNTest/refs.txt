@@ -1,3 +1,1 @@
-http://jsfiddle.net/gnESX/3/
 http://www.ai-junkie.com/ann/evolved/nnt1.html
-http://www.openprocessing.org/sketch/4255

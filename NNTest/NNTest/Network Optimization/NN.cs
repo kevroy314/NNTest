@@ -8,6 +8,13 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace NNTest
 {
+    /* The Neural Network class is provided as the "brains" of the simulations.
+     * This class is serializable so it can be saved to file if desired.
+     * There are many parameter which are populated when the network is first created.
+     * This allows for rapid calls of the network processing function at the cost
+     * of initial configuration time.
+     */
+
     [Serializable]
     public class NN
     {

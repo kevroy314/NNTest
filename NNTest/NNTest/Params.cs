@@ -6,8 +6,21 @@ using System.Drawing;
 
 namespace NNTest
 {
+    /* The Params class stores most of the configurable parameters in the application.
+     */
+
     class Params
     {
+        #region MainForm Parameters
+
+        //The number of entities to be used in the population simulation
+        public const int simulationPopulationSize = 30;
+
+        //The structure of their brains
+        public static readonly int[] neuralNetworkStructure = { 4, 6, 2 };
+
+        #endregion
+
         #region NNPopulation Parameters
 
         //The number of iterations the NNPopulationSimulation which calculates the fitness should run (range 1-inf)
@@ -40,26 +53,6 @@ namespace NNTest
 
         #endregion
 
-        #region NN Parameters
-
-        //Used in the sigmoid function
-        public const double activationResponse = 1;
-
-        //The bias for the network
-        public const double bias = -1;
-
-        #endregion
-
-        #region NetworkTester Parameters
-
-        //The number of entities to be used in the population simulation
-        public const int simulationPopulationSize = 30;
-
-        //The structure of their brains
-        public static readonly int[] neuralNetworkStructure = { 4, 6, 2 };
-
-        #endregion
-
         #region NNAntSimulation Parameters
 
         //The amount of food which should be in each simulation at the beginning of each iteration
@@ -87,6 +80,16 @@ namespace NNTest
 
         //Maximum amount of rotation the ant can have in any iteration
         public const double maxRotationRate = 0.3;
+
+        #endregion
+
+        #region NN Parameters
+
+        //Used in the sigmoid function
+        public const double activationResponse = 1;
+
+        //The bias for the network
+        public const double bias = -1;
 
         #endregion
     }

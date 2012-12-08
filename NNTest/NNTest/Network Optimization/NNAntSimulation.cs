@@ -11,9 +11,11 @@ using Microsoft.Xna.Framework;
 
 namespace NNTest
 {
-    //This simulation class provides a way for the NN to determine its fitness each generation.
-    //It is also a form, thus satisfying the requirement for a Show and Close function.
-    public partial class NNAntSimulation : Form, NNPopulationSimulation
+    /* This simulation class provides a way for the NN to determine its fitness each generation.
+     * It is also a form, thus satisfying the requirement for a Show and Close function.
+     */
+
+    public partial class NNAntSimulation : Form, INNPopulationSimulation
     {
         #region Member Variables
 
@@ -33,6 +35,7 @@ namespace NNTest
         //Construct an ant simulation with a certain population
         public NNAntSimulation(int populationSize)
         {
+            //Initialize the GUI
             InitializeComponent();
 
             //We don't show the form by default
@@ -44,7 +47,10 @@ namespace NNTest
             for (int i = 0; i < ants.Length; i++)
             {
                 //Create a random ant
-                ants[i] = new SimAnt(Util.randNumGen.NextDouble() * Math.PI * 2, 0, new Vector2(Util.randNumGen.Next(0, Params.clientWidth), Util.randNumGen.Next(0, Params.clientHeight)));
+                ants[i] = new SimAnt(Util.randNumGen.NextDouble() * Math.PI * 2, 
+                                     0, 
+                                     new Vector2(Util.randNumGen.Next(0, Params.clientWidth), 
+                                                 Util.randNumGen.Next(0, Params.clientHeight)));
             }
 
             //Initialize the list of food
@@ -52,7 +58,8 @@ namespace NNTest
 
             //Fill the food list with randomly generated food positions on the canvas
             for (int i = 0; i < Params.foodCount; i++)
-                food.Add(new Vector2(Util.randNumGen.Next(0, Params.clientWidth - 1), Util.randNumGen.Next(0, Params.clientHeight - 1)));
+                food.Add(new Vector2(Util.randNumGen.Next(0, Params.clientWidth - 1), 
+                                     Util.randNumGen.Next(0, Params.clientHeight - 1)));
         }
 
         #endregion
@@ -106,14 +113,26 @@ namespace NNTest
 
                     //Draw the food rectangles
                     for (int j = 0; j < food.Count; j++)
-                        g.FillRectangle(Params.foodBrush, food[j].X - Params.foodSize / 2, food[j].Y - Params.foodSize / 2, Params.foodSize, Params.foodSize);
+                        g.FillRectangle(Params.foodBrush, 
+                                        food[j].X - Params.foodSize / 2, 
+                                        food[j].Y - Params.foodSize / 2, 
+                                        Params.foodSize, 
+                                        Params.foodSize);
 
                     //Draw the ant circles
                     for (int j = 0; j < ants.Length; j++)
                         if(j<highlightIndiciesUnder)
-                            g.FillEllipse(Params.highlightedAntBrush, ants[j].Position.X - Params.antSize / 2, ants[j].Position.Y - Params.antSize / 2, Params.antSize, Params.antSize);
+                            g.FillEllipse(Params.highlightedAntBrush, 
+                                          ants[j].Position.X - Params.antSize / 2, 
+                                          ants[j].Position.Y - Params.antSize / 2, 
+                                          Params.antSize, 
+                                          Params.antSize);
                         else
-                            g.FillEllipse(Params.antBrush, ants[j].Position.X - Params.antSize / 2, ants[j].Position.Y - Params.antSize / 2, Params.antSize, Params.antSize);
+                            g.FillEllipse(Params.antBrush, 
+                                          ants[j].Position.X - Params.antSize / 2, 
+                                          ants[j].Position.Y - Params.antSize / 2, 
+                                          Params.antSize, 
+                                          Params.antSize);
                 }
 
                 //Create a list to store the food which should be replaced at the end of the loop
@@ -140,31 +159,38 @@ namespace NNTest
                     Vector2 foodDirection = nearestFoodResult.Item1;
                     foodDirection = nearestFoodResult.Item1 - ants[j].Position;
                     foodDirection.Normalize();
+
                     if (isShowing)
                     {
+                        //If we're showing the form, draw a line pointing to the food and a line pointing in the ant look at direction
                         g.DrawLine(Pens.Green, ants[j].Position.X, ants[j].Position.Y, ants[j].Position.X + foodDirection.X * 10, ants[j].Position.Y + foodDirection.Y * 10);
                         g.DrawLine(Pens.Yellow, ants[j].Position.X, ants[j].Position.Y, ants[j].Position.X + ants[j].LookAt.X * 10, ants[j].Position.Y + ants[j].LookAt.Y * 10);
                     }
 
-                    //NOTE: THIS SECTION SHOULD BE CHANGED TO REFLECT MORE INPUTS WHICH COULD PRODUCE A MORE ROBUST NETWORK
                     //Generate the inputs for this iteration of the neural network
                     double[] NNInput = new double[] { foodDirection.X,foodDirection.Y, ants[j].LookAt.X, ants[j].LookAt.Y};
 
                     //Compute the outputs from the neural network
                     double[] NNOutput = population[j].ComputeNNOutputs(NNInput);
 
+                    //Compute the force of rotation
                     double rotationForce = NNOutput[0] - NNOutput[1];
 
+                    //Limit the degree of rotation
                     if (rotationForce < -Params.maxRotationRate)
                         rotationForce = -Params.maxRotationRate;
                     else if (rotationForce > Params.maxRotationRate)
                         rotationForce = Params.maxRotationRate;
 
+                    //Add the degree of rotation to the orientation
                     ants[j].Orientation += rotationForce;
 
+                    //Calculate the speed as the sum of the network outputs
                     ants[j].Speed = (NNOutput[0] + NNOutput[1]);
 
-                    ants[j].LookAt = new Vector2(-(float)Math.Sin(ants[j].Orientation), (float)Math.Cos(ants[j].Orientation));
+                    //Calculate the look at vector
+                    ants[j].LookAt = new Vector2(-(float)Math.Sin(ants[j].Orientation), 
+                                                  (float)Math.Cos(ants[j].Orientation));
 
                     //Adjust the position of the ant relative to the neural network outputs
                     float x = ants[j].LookAt.X * (float)ants[j].Speed + ants[j].Position.X;
@@ -174,6 +200,7 @@ namespace NNTest
                     x = (x + Params.clientWidth) % Params.clientWidth;
                     y = (y + Params.clientHeight) % Params.clientHeight;
 
+                    //Set the new position
                     ants[j].Position = new Vector2(x, y);
                 }
 
@@ -186,7 +213,8 @@ namespace NNTest
 
                 for(int j = 0; j < Params.foodCount - food.Count;j++)
                     //Add a new food for every missing food
-                    food.Add(new Vector2(Util.randNumGen.Next(0, Params.clientWidth - 1), Util.randNumGen.Next(0, Params.clientHeight - 1)));
+                    food.Add(new Vector2(Util.randNumGen.Next(0, Params.clientWidth - 1), 
+                                         Util.randNumGen.Next(0, Params.clientHeight - 1)));
 
                 if (isShowing)
                 {
@@ -198,7 +226,7 @@ namespace NNTest
                 }
             }
 
-            //If the simulation is showing at the end
+            //If the simulation is showing at the end of the iteration count
             if (isShowing)
             {
                 //Find the maximum score this round
@@ -239,7 +267,9 @@ namespace NNTest
             {
                 //Calculate the distance
 
-                /*
+                /* TODO: OPTIMIZE AND INCLUDE WRAPPING DISTANCES
+                 * YOU WILL NEED TO MODIFY THE CALCULATION OF THE 
+                 * LOOK AT IN THE UPDATE FUNCTION TO MATCH
                 double dx = Math.Abs(input.X - foodItem.X);
                 double dy = Math.Abs(input.Y - foodItem.Y);
                 if (dx > Params.clientWidth / 2)
@@ -250,8 +280,11 @@ namespace NNTest
                 double d = (dx * dx) + (dy * dy);
                 */
 
-                 //double d = Vector2.Distance(input, foodItem);
-                double d = Math.Sqrt((input.X - foodItem.X) * (input.X - foodItem.X) + (input.Y - foodItem.Y) * (input.Y - foodItem.Y));
+                /* Calculate the distance, alternative would be:
+                 * double d = Vector2.Distance(input, foodItem); */
+                double d = Math.Sqrt((input.X - foodItem.X) * (input.X - foodItem.X) + 
+                                     (input.Y - foodItem.Y) * (input.Y - foodItem.Y));
+
                 //If this is a new biggest
                 if (d < minDist)
                 {
@@ -260,8 +293,6 @@ namespace NNTest
                     minFoodItem = foodItem;
                 }
             }
-
-            //minDist = Vector2.Distance(input, minFoodItem);
 
             //Return the results
             return new Tuple<Vector2, double>(minFoodItem, minDist);

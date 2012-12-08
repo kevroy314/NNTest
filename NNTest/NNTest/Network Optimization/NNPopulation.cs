@@ -5,9 +5,12 @@ using System.Text;
 
 namespace NNTest
 {
-    //This class represents a population of neural networks which can breed, mutate, and evaluate their fitness
+    /* This class represents a population of neural networks which can breed, mutate, and evaluate their fitness
+     */
+
     class NNPopulation
     {
+        //The possible breeding functions the population can use when transitioning generations.
         public enum BreedingFunction { Average = 0, Crossover = 1, PickEach = 2 };
 
         #region Member Variables
@@ -40,7 +43,10 @@ namespace NNTest
 
             //Generate nerual networks for the genetic algorithm to use to compete
             for (int i = 0; i < startingPopulationSize; i++)
-                population.Add(new NN(neuralNetworkLayerSizes[0], neuralNetworkLayerSizes[neuralNetworkLayerSizes.Length - 1], neuralNetworkLayerSizes.Length - 2, hiddenLayers));
+                population.Add(new NN(neuralNetworkLayerSizes[0], 
+                                      neuralNetworkLayerSizes[neuralNetworkLayerSizes.Length - 1], 
+                                      neuralNetworkLayerSizes.Length - 2, 
+                                      hiddenLayers));
         }
 
         #endregion
@@ -52,14 +58,17 @@ namespace NNTest
         public double[] CalculateFitness(Type simulationType, bool showSimulation)
         {
             //Create an instance of a NNPopulationSimulation of the specified type
-            NNPopulationSimulation sim = (NNPopulationSimulation)Activator.CreateInstance(simulationType, new object[] { population.Count });
+            INNPopulationSimulation sim = (INNPopulationSimulation)Activator.CreateInstance(simulationType, 
+                                                                                          new object[] { population.Count });
 
             if (showSimulation)
                 //Show the simulation (the simulation may choose to not perform any operations on this call
                 sim.ShowSimulation();
 
             //Run the simulation on the current population for a set number of iterations
-            double[] output = sim.RunPopulationSimulation(population, Params.numFitnessSimulationIterations, Params.numberOfElites * Params.numOfCopiesOfElites);
+            double[] output = sim.RunPopulationSimulation(population, 
+                                                          Params.numFitnessSimulationIterations, 
+                                                          Params.numberOfElites * Params.numOfCopiesOfElites);
 
             if (showSimulation)
                 //Close the simulation if it requires that
@@ -101,7 +110,8 @@ namespace NNTest
             for (int i = 0; i < numToBreed; i++)
                 for (int j = i + 1; j < numToBreed; j++)
                     //Select their indicies
-                    potentialBreeders.Add(new Tuple<int, int>(sortedFitnessList[i].Key, sortedFitnessList[j].Key));
+                    potentialBreeders.Add(new Tuple<int, int>(sortedFitnessList[i].Key, 
+                                                              sortedFitnessList[j].Key));
 
             //Randomly shuffle via inside out Knuth Shuffle
             for (int i = 0; i < potentialBreeders.Count; i++)
@@ -146,10 +156,16 @@ namespace NNTest
                 else
                 {
                     //Create a new neural network with the same structure as the rest of the population
-                    NN child1 = new NN(networkStructure[0], networkStructure[networkStructure.Length - 1], hiddenLayerStructure.Length, hiddenLayerStructure);
+                    NN child1 = new NN(networkStructure[0], 
+                                       networkStructure[networkStructure.Length - 1], 
+                                       hiddenLayerStructure.Length, 
+                                       hiddenLayerStructure);
 
                     //Create a new neural network with the same structure as the rest of the population
-                    NN child2 = new NN(networkStructure[0], networkStructure[networkStructure.Length - 1], hiddenLayerStructure.Length, hiddenLayerStructure);
+                    NN child2 = new NN(networkStructure[0], 
+                                       networkStructure[networkStructure.Length - 1], 
+                                       hiddenLayerStructure.Length, 
+                                       hiddenLayerStructure);
 
                     //Add all genes from each parent up to the crossover point to the two different children
                     int i;
@@ -211,10 +227,16 @@ namespace NNTest
                 else
                 {
                     //Create a new neural network with the same structure as the rest of the population
-                    NN child1 = new NN(networkStructure[0], networkStructure[networkStructure.Length - 1], hiddenLayerStructure.Length, hiddenLayerStructure);
+                    NN child1 = new NN(networkStructure[0], 
+                                       networkStructure[networkStructure.Length - 1], 
+                                       hiddenLayerStructure.Length, 
+                                       hiddenLayerStructure);
 
                     //Create a new neural network with the same structure as the rest of the population
-                    NN child2 = new NN(networkStructure[0], networkStructure[networkStructure.Length - 1], hiddenLayerStructure.Length, hiddenLayerStructure);
+                    NN child2 = new NN(networkStructure[0], 
+                                       networkStructure[networkStructure.Length - 1], 
+                                       hiddenLayerStructure.Length, 
+                                       hiddenLayerStructure);
 
                     //Determine the crossover point in the genes
                     int crossoverPoint = Util.randNumGen.Next(0, population[k].Weights.Length);
@@ -265,7 +287,10 @@ namespace NNTest
             while (newPopulation.Count < population.Count)
             {
                 //Add a new neural network to the population with the same structure as the rest of the population
-                newPopulation.Add(new NN(networkStructure[0], networkStructure[networkStructure.Length - 1], hiddenLayerStructure.Length, hiddenLayerStructure));
+                newPopulation.Add(new NN(networkStructure[0], 
+                                         networkStructure[networkStructure.Length - 1], 
+                                         hiddenLayerStructure.Length, 
+                                         hiddenLayerStructure));
 
                 //For each weight in the breeding couple, average the weights of the parents to create the child weights
                 for (int j = 0; j < newPopulation[k].Weights.Length; j++)
@@ -296,7 +321,8 @@ namespace NNTest
                     {
                         //Mutate a random weight within the mutation range (this weight could be the same weight every mutation, resulting in compounded mutations on a given weight)
                         int mutatedIndex = Util.randNumGen.Next(0, population[i].Weights.Length - 1);
-                        double mutatedDegree = (Util.randNumGen.NextDouble() * weightMutationIntensityRange) - (Util.randNumGen.NextDouble() * weightMutationIntensityRange);
+                        double mutatedDegree = (Util.randNumGen.NextDouble() * weightMutationIntensityRange) - 
+                                               (Util.randNumGen.NextDouble() * weightMutationIntensityRange);
                         population[i].Weights[mutatedIndex] += mutatedDegree;
                         mutationCount++;
                     }
@@ -323,7 +349,10 @@ namespace NNTest
                 population = BreedPickEach(breedingCouples, sortedFitnessList);
 
             //Mutate the new population
-            Mutate(Params.probabilityOfWeightMutationIfChosenToMutate, (int)(((double)population.Count) * Params.minimumProportionOfMutationsPerPopulationMember), (int)(((double)population.Count) * Params.maximumProportionOfMutationsPerPopulationMember), Params.rangeOfMutationPerturbation);
+            Mutate(Params.probabilityOfWeightMutationIfChosenToMutate, 
+                  (int)(((double)population.Count) * Params.minimumProportionOfMutationsPerPopulationMember), 
+                  (int)(((double)population.Count) * Params.maximumProportionOfMutationsPerPopulationMember), 
+                  Params.rangeOfMutationPerturbation);
         }
 
         #endregion
