@@ -92,5 +92,15 @@ namespace NNTest
         public const double bias = -1;
 
         #endregion
+
+        #region NNSpaceShipSimulation
+
+        public const double G = 0.00000000006673;
+
+        public const int numGBodies = 10;
+
+        public const float maxMass = 100;
+
+        #endregion
     }
 }

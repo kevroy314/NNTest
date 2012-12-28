@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace NNTest
 {
@@ -29,6 +30,11 @@ namespace NNTest
         private bool requestStop;
 
         private int numIterations;
+
+        private List<double> avgScoreList;
+        private List<double> movAvgScoreList;
+        private List<double> maxScoreList;
+        private List<double> movMaxScoreList;
 
         #endregion
 
@@ -57,6 +63,26 @@ namespace NNTest
             comboBox_BreedingType.SelectedIndex = 1;
 
             numIterations = 0;
+
+            avgScoreList = new List<double>();
+            movAvgScoreList = new List<double>();
+            maxScoreList = new List<double>();
+            movMaxScoreList = new List<double>();
+
+            Series mAvgSeries = new Series("Average Moving Average");
+            Series avgSeries = new Series("Average");
+            Series mMaxSeries = new Series("Max Moving Average");
+            Series maxSeries = new Series("Max");
+            
+            mAvgSeries.ChartType = SeriesChartType.Spline;
+            avgSeries.ChartType = SeriesChartType.Line;
+            mMaxSeries.ChartType = SeriesChartType.Spline;
+            maxSeries.ChartType = SeriesChartType.Line;
+
+            chart.Series.Add(mAvgSeries);
+            chart.Series.Add(avgSeries);
+            chart.Series.Add(mMaxSeries);
+            chart.Series.Add(maxSeries);
         }
 
         #endregion
@@ -150,7 +176,8 @@ namespace NNTest
             StringBuilder outputBuilder = new StringBuilder();
 
             //Iterate the simulation
-            for (int j = 0; j < numericUpDown_numGenerations.Value; j++)
+            int j = 0;
+            for (j = 0; j < numericUpDown_numGenerations.Value; j++)
             {
                 numIterations++;
 
@@ -172,28 +199,33 @@ namespace NNTest
                 }
 
                 //Update the chart
-                if(checkBox_updateChart.Checked)
-                    AddChartElements(sum / latestFitness.Length, maxFitness);
+                AddChartElements(sum / latestFitness.Length, maxFitness);
+                
+                if (!checkBox_fastMode.Checked)
+                {
+                    if (checkBox_updateChart.Checked)
+                        UpdateChart();
 
-                //Update the iteration counters
-                SetIterationLabelText("Iteration: " + (j + 1) + "/" + numericUpDown_numGenerations.Value);
-                SetTotalIterationLabelText(numIterations + " Total Iterations, Population Size: " + pop.Population.Count);
+                    //Update the iteration counters
+                    SetIterationLabelText("Iteration: " + (j + 1) + "/" + numericUpDown_numGenerations.Value);
+                    SetTotalIterationLabelText(numIterations + " Total Iterations, Population Size: " + pop.Population.Count);
 
-                //Repaint the form
-                UpdateForm();
+                    //Repaint the form
+                    UpdateForm();
 
-                //Clear the output field
-                ClearSimpleOutRichTextBoxBox();
+                    //Clear the output field
+                    ClearSimpleOutRichTextBoxBox();
 
-                //Fill the output string builder with the fitness data from this generation
-                for (int i = 0; i < pop.LatestFitness.Length; i++)
-                    outputBuilder.AppendFormat("{0} ", pop.LatestFitness[i]);
+                    //Fill the output string builder with the fitness data from this generation
+                    for (int i = 0; i < pop.LatestFitness.Length; i++)
+                        outputBuilder.AppendFormat("{0} ", pop.LatestFitness[i]);
 
-                //Output the fitness data
-                SetSimpleOutRichTextBoxBoxText(outputBuilder.ToString());
+                    //Output the fitness data
+                    SetSimpleOutRichTextBoxBoxText(outputBuilder.ToString());
 
-                //Reset the output builder
-                outputBuilder.Clear();
+                    //Reset the output builder
+                    outputBuilder.Clear();
+                }
 
                 //If this function is running in the simulation thread and it was aborted
                 if (requestStop)
@@ -214,11 +246,12 @@ namespace NNTest
             DateTime after = DateTime.Now;
 
             //Show a message box with the total seconds it took to run the complete program
-            SetIterationLabelText(label_iteration.Text + ", Seconds: " + after.Subtract(before).TotalSeconds);
+            SetIterationLabelText("Iteration: " + j + "/" + numericUpDown_numGenerations.Value + ", Seconds: " + after.Subtract(before).TotalSeconds);
 
             //Finally update and refresh the form
             UpdateForm();
             RefreshForm();
+            UpdateChart();
         }
 
         #endregion
@@ -270,6 +303,24 @@ namespace NNTest
             }
         }
 
+        //Update the chart graphics (can be very slow with a large number of elements
+        delegate void UpdateChartCallback();
+        private void UpdateChart()
+        {
+            if (this.chart.InvokeRequired)
+            {
+                UpdateChartCallback c = new UpdateChartCallback(UpdateChart);
+                this.Invoke(c, new object[] { });
+            }
+            else
+            {
+                chart.Series["Average Moving Average"].Points.DataBindY(movAvgScoreList);
+                chart.Series["Average"].Points.DataBindY(avgScoreList);
+                chart.Series["Max Moving Average"].Points.DataBindY(movMaxScoreList);
+                chart.Series["Max"].Points.DataBindY(maxScoreList);
+            }
+        }
+
         //For adding an element to the chart
         delegate void AddChartElementsCallback(double average, double max);
         private void AddChartElements(double average, double max)
@@ -282,39 +333,32 @@ namespace NNTest
             else
             {
                 //If this is the first point
-                if (chart.Series[0].Points.Count == 0)
+                if (avgScoreList.Count == 0)
                 {
                     //Set the averages to the first point and set the points
-                    chart.Series["Average Moving Average"].Points.AddY(average);
-                    chart.Series["Average"].Points.AddY(average);
-                    chart.Series["Max Moving Average"].Points.AddY(max);
-                    chart.Series["Max"].Points.AddY(max);
+                    movAvgScoreList.Add(average);
+                    avgScoreList.Add(average);
+                    movMaxScoreList.Add(max);
+                    maxScoreList.Add(max);
                 }
                 //If there are fewer points than the window size
-                else if (chart.Series[0].Points.Count < (int)numericUpDown_movingAverageWindowSize.Value)
+                else if (avgScoreList.Count < (int)numericUpDown_movingAverageWindowSize.Value)
                 {
                     //Average with the number of points as the window size and set the points
-                    chart.Series["Average Moving Average"].Points.AddY(Util.CalculateMovingAverage(chart.Series["Average Moving Average"].Points[chart.Series["Average Moving Average"].Points.Count - 1].YValues[0], 
-                                                                       average, 
-                                                                       chart.Series[0].Points.Count + 1));
-                    chart.Series["Average"].Points.AddY(average);
-                    chart.Series["Max Moving Average"].Points.AddY(Util.CalculateMovingAverage(chart.Series["Max Moving Average"].Points[chart.Series["Max Moving Average"].Points.Count - 1].YValues[0], 
-                                                                   max, 
-                                                                   chart.Series[0].Points.Count + 1));
-                    chart.Series["Max"].Points.AddY(max);
+                    movAvgScoreList.Add(Util.CalculateMovingAverage(movAvgScoreList[movAvgScoreList.Count - 1], average, movAvgScoreList.Count + 1));
+                    avgScoreList.Add(average);
+                    movMaxScoreList.Add(Util.CalculateMovingAverage(movMaxScoreList[movMaxScoreList.Count - 1], max, movMaxScoreList.Count + 1));
+                    maxScoreList.Add(max);
                 }
                 //If there are more points than the window size
                 else
                 {
                     //Average with the window size and set the points
-                    chart.Series["Average Moving Average"].Points.AddY(Util.CalculateMovingAverage(chart.Series["Average Moving Average"].Points[chart.Series["Average Moving Average"].Points.Count - 1].YValues[0], average, (int)numericUpDown_movingAverageWindowSize.Value));
-                    chart.Series["Average"].Points.AddY(average);
-                    chart.Series["Max Moving Average"].Points.AddY(Util.CalculateMovingAverage(chart.Series["Max Moving Average"].Points[chart.Series["Max Moving Average"].Points.Count - 1].YValues[0], max, (int)numericUpDown_movingAverageWindowSize.Value));
-                    chart.Series["Max"].Points.AddY(max);
+                    movAvgScoreList.Add(Util.CalculateMovingAverage(movAvgScoreList[movAvgScoreList.Count - 1], average, movAvgScoreList.Count + 1));
+                    avgScoreList.Add(average);
+                    movMaxScoreList.Add(Util.CalculateMovingAverage(movMaxScoreList[movMaxScoreList.Count - 1], max, (int)numericUpDown_movingAverageWindowSize.Value));
+                    maxScoreList.Add(max);
                 }
-
-                //Update the chart
-                chart.Update();
             }
         }
 
@@ -504,6 +548,11 @@ namespace NNTest
             //Clear the chart
             for (int i = 0; i < chart.Series.Count; i++)
                 chart.Series[i].Points.Clear();
+
+            avgScoreList.Clear();
+            movAvgScoreList.Clear();
+            maxScoreList.Clear();
+            movMaxScoreList.Clear();
 
             //Clear the iteration text
             label_iteration.Text = "Iteration: ";

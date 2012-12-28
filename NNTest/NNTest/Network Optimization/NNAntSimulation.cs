@@ -290,9 +290,9 @@ namespace NNTest
                 
 
                 //Calculate the distance
-                //double d = Vector2.Distance(input, foodItem);
-                double d = Math.Sqrt((input.X - foodItem.X) * (input.X - foodItem.X) + 
-                                     (input.Y - foodItem.Y) * (input.Y - foodItem.Y));
+                double d = Vector2.Distance(input, foodItem);
+                //double d = Math.Sqrt((input.X - foodItem.X) * (input.X - foodItem.X) + 
+                //                     (input.Y - foodItem.Y) * (input.Y - foodItem.Y));
 
                 //If this is a new biggest
                 if (d < minDist)
