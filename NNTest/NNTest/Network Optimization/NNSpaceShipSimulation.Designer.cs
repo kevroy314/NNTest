@@ -1,4 +1,4 @@
-﻿namespace NNTest.Network_Optimization
+﻿namespace NNTest
 {
     partial class NNSpaceShipSimulation
     {

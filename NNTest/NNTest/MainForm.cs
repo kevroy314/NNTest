@@ -182,8 +182,12 @@ namespace NNTest
                 numIterations++;
 
                 //Run a single generation in the neural network ant simulation
-                pop.RunGeneration(typeof(NNAntSimulation), 
-                                  checkBox_showSimulation.Checked, 
+                //pop.RunGeneration(typeof(NNAntSimulation), 
+                //                  checkBox_showSimulation.Checked, 
+                //                  (NNPopulation.BreedingFunction)GetSelectedBreedingIndex());
+
+                pop.RunGeneration(typeof(NNSpaceShipSimulation),
+                                  checkBox_showSimulation.Checked,
                                   (NNPopulation.BreedingFunction)GetSelectedBreedingIndex());
 
                 //Get the latest fitness array from the simulation

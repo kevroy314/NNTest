@@ -24,7 +24,7 @@ namespace NNTest
         #region NNPopulation Parameters
 
         //The number of iterations the NNPopulationSimulation which calculates the fitness should run (range 1-inf)
-        public const int numFitnessSimulationIterations = 2000;
+        public const int numFitnessSimulationIterations = 200000;
 
         //This probability will decide how likely it is a genes will mutate if it is selected to mutate (range 0-1)
         public const double probabilityOfWeightMutationIfChosenToMutate = 0.1;
@@ -95,11 +95,17 @@ namespace NNTest
 
         #region NNSpaceShipSimulation
 
-        public const double G = 0.00000000006673;
+        public const double G = 6673;
 
         public const int numGBodies = 10;
 
         public const float maxMass = 100;
+
+        public const float gBodyDrawScale = 0.5f;
+
+        public const float shipMass = 1f;
+
+        public const float minGravityDistance = 1f;
 
         #endregion
     }

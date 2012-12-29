@@ -177,6 +177,11 @@ namespace NNTest
                         //If we're showing the form, draw a line pointing to the food and a line pointing in the ant look at direction
                         g.DrawLine(Pens.Green, ants[j].Position.X, ants[j].Position.Y, ants[j].Position.X + foodDirection.X * 10, ants[j].Position.Y + foodDirection.Y * 10);
                         g.DrawLine(Pens.Yellow, ants[j].Position.X, ants[j].Position.Y, ants[j].Position.X + ants[j].LookAt.X * 10, ants[j].Position.Y + ants[j].LookAt.Y * 10);
+                        //Draw the buffer to the form
+                        finalG.DrawImage(buffer, 0, 0);
+
+                        //Update the form
+                        this.Update();
                     }
 
                     //Generate the inputs for this iteration of the neural network
@@ -227,15 +232,6 @@ namespace NNTest
                     //Add a new food for every missing food
                     food.Add(new Vector2(Util.randNumGen.Next(0, Params.clientWidth - 1), 
                                          Util.randNumGen.Next(0, Params.clientHeight - 1)));
-
-                if (isShowing)
-                {
-                    //Draw the buffer to the form
-                    finalG.DrawImage(buffer, 0, 0);
-
-                    //Update the form
-                    this.Update();
-                }
             }
 
             //If the simulation is showing at the end of the iteration count

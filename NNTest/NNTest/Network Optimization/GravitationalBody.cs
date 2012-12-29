@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 
-namespace NNTest.Network_Optimization
+namespace NNTest
 {
     class GravitationalBody
     {
@@ -27,13 +27,16 @@ namespace NNTest.Network_Optimization
             m = (float)Util.randNumGen.NextDouble() * (maxMass - minMass) - minMass;
         }
 
-        public Vector2 calculateAcceleration(Vector2 position, float mass)
+        public Vector2 calculateAcceleration(Vector2 position, float mass, float minDistance)
         {
             Vector2 r12 = Vector2.Subtract(pos,position);
             Vector2 r12n = new Vector2(r12.X,r12.Y);
             r12n.Normalize();
 
-            return (float)(-(Params.G * m * mass / ((r12 * r12).LengthSquared()))) * r12n;
+            if(r12.Length()>minDistance)
+                return (float)(-(Params.G * m * mass / ((r12 * r12).LengthSquared()))) * r12n;
+            else
+                return (float)(-(Params.G * m * mass / (minDistance*minDistance))) * r12n;
         }
 
         #region Properties
