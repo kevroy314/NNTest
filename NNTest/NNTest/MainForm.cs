@@ -186,7 +186,7 @@ namespace NNTest
                 //                  checkBox_showSimulation.Checked, 
                 //                  (NNPopulation.BreedingFunction)GetSelectedBreedingIndex());
 
-                pop.RunGeneration(typeof(NNSpaceShipSimulation),
+                pop.RunGeneration(typeof(NNAntSimulation),
                                   checkBox_showSimulation.Checked,
                                   (NNPopulation.BreedingFunction)GetSelectedBreedingIndex());
 
